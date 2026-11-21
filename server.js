@@ -528,7 +528,7 @@ app.post('/api/call/bolna', async (req, res) => {
 app.post('/api/call/elevenlabs', async (req, res) => {
     try {
         const xiKey = (process.env.ELEVENLABS_API_KEY || '').trim();
-        const agentId = req.body?.agentId || (process.env.ELEVENLABS_AGENT_ID || '').trim() || 'agent_1901m4kqdmycfkn9pra87mp8jmtd';
+        const agentId = req.body?.agentId || (process.env.ELEVENLABS_AGENT_ID || '').trim() || 'agent_7301m7yskfjberetytdk0ds7gdag';
         const phoneNumberId = (process.env.ELEVENLABS_PHONE_NUMBER_ID || '').trim();
 
         const isTestMode = process.env.TEST_MODE === 'true';
@@ -1146,11 +1146,13 @@ app.get(['/', '/dashboard-tft.html', '/tft', '/index.html'], (req, res) => {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
+    res.setHeader('Permissions-Policy', 'microphone=*');
     res.sendFile(path.join(__dirname, 'dashboard-tft.html'));
 });
 
 app.get('/desktop', (req, res) => {
     if (fs.existsSync(path.join(__dirname, 'index.html'))) {
+        res.setHeader('Permissions-Policy', 'microphone=*');
         res.sendFile(path.join(__dirname, 'index.html'));
     } else {
         res.redirect('/dashboard-tft.html');
@@ -1165,6 +1167,7 @@ app.use(express.static(path.join(__dirname), {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
+        res.setHeader('Permissions-Policy', 'microphone=*');
     }
 }));
 

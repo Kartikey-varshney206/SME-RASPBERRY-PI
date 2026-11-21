@@ -2617,7 +2617,7 @@
                                 </button>
                             </div>
                             <div style="margin-top: 10px; text-align: center;">
-                                <a href="https://elevenlabs.io/app/talk-to?agent_id=agent_1901m4kqdmycfkn9pra87mp8jmtd" target="_blank" class="btn-advisor-fallback" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #4f46e5; color: #ffffff; border-radius: 9999px; font-size: 0.88rem; font-weight: 600; text-decoration: none; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3); transition: transform 0.15s ease;">
+                                <a href="https://elevenlabs.io/app/talk-to?agent_id=agent_7301m7yskfjberetytdk0ds7gdag" target="_blank" class="btn-advisor-fallback" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #4f46e5; color: #ffffff; border-radius: 9999px; font-size: 0.88rem; font-weight: 600; text-decoration: none; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3); transition: transform 0.15s ease;">
                                     <span>🎙️ Launch Direct ElevenLabs Voice Session</span>
                                     <span>↗</span>
                                 </a>
@@ -4355,6 +4355,12 @@
                         console.log("[ElevenLabs ConvAI Call Event]", event);
                         if (!event.detail) return;
                         event.detail.config = event.detail.config || {};
+                        event.detail.config.connectionType = 'websocket';
+
+                        if (typeof stopListening === 'function' && window.voiceState === 'listening') {
+                            try { stopListening(false); } catch (e) {}
+                        }
+
                         event.detail.config.clientTools = event.detail.config.clientTools || {};
 
                     const handlePaymentTool = async (args = {}) => {
@@ -4429,7 +4435,7 @@
     </div>
 
     <!-- ElevenLabs Conversational Voice Agent Widget (Official Embed) -->
-    <elevenlabs-convai agent-id="agent_1901m4kqdmycfkn9pra87mp8jmtd"></elevenlabs-convai>
+    <elevenlabs-convai agent-id="agent_7301m7yskfjberetytdk0ds7gdag"></elevenlabs-convai>
     <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 </body>
 </html>
