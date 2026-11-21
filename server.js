@@ -740,32 +740,151 @@ function runInLedgerQueue(task) {
     });
 }
 
+const PAYMENTS_CSV_PATH = path.join(__dirname, 'payments.csv');
+const PAYMENTS_XLSX_PATH = path.join(__dirname, 'payments.xlsx');
+
+function parseAmount(val) {
+    if (typeof val === 'number') return isNaN(val) ? 0 : val;
+    if (!val) return 0;
+    let s = String(val).toLowerCase().replace(/[,₹$]/g, '').trim();
+    if (s.endsWith('k')) {
+        return (parseFloat(s.slice(0, -1)) || 0) * 1000;
+    }
+    if (s.endsWith('lakh') || s.endsWith('lac') || s.endsWith('l')) {
+        return (parseFloat(s.replace(/(lakh|lac|l)/, '')) || 0) * 100000;
+    }
+    if (s.endsWith('cr') || s.endsWith('crore')) {
+        return (parseFloat(s.replace(/(cr|crore)/, '')) || 0) * 10000000;
+    }
+    return parseFloat(s) || 0;
+}
+
+function normalizeTransactionType(type) {
+    if (!type) return 'payment_received';
+    const t = String(type).toLowerCase().trim();
+    if (t.includes('paid') || t.includes('payment') || t.includes('received') || t.includes('jama') || t.includes('collect')) {
+        return 'payment_received';
+    }
+    if (t.includes('borrow') || t.includes('credit') || t.includes('udhaar') || t.includes('given')) {
+        return 'credit_given';
+    }
+    if (t.includes('miss') || t.includes('not paid') || t.includes('pending') || t.includes('due')) {
+        return 'payment_missed';
+    }
+    return 'payment_received';
+}
+
+function appendToPaymentsCsv({ customer, type, amount, date, time, note, source }) {
+    try {
+        if (!fs.existsSync(PAYMENTS_CSV_PATH)) {
+            fs.writeFileSync(PAYMENTS_CSV_PATH, 'Date,Time,Customer,Type,Amount,Note,Source\r\n', 'utf8');
+        }
+        const cleanCustomer = String(customer || '').replace(/"/g, '""');
+        const cleanNote = String(note || '').replace(/"/g, '""');
+        const displayType = (type === 'payment_received') ? 'Payment Received' : (type === 'credit_given' ? 'Credit Given' : 'Payment Missed');
+        const line = `"${date}","${time}","${cleanCustomer}","${displayType}",${amount},"${cleanNote}","${source || 'voice'}"\r\n`;
+        fs.appendFileSync(PAYMENTS_CSV_PATH, line, 'utf8');
+        logLedger(`payments.csv: Appended on the spot -> ${cleanCustomer} ₹${amount} (${displayType})`);
+    } catch (err) {
+        console.error('Error writing to payments.csv:', err.message);
+    }
+}
+
+async function updatePaymentsXlsx({ customer, type, amount, date, time, note, source }) {
+    try {
+        const wb = new ExcelJS.Workbook();
+        if (fs.existsSync(PAYMENTS_XLSX_PATH)) {
+            try {
+                const buf = fs.readFileSync(PAYMENTS_XLSX_PATH);
+                if (buf && buf.length > 0) {
+                    await wb.xlsx.load(buf);
+                }
+            } catch (readErr) {
+                // If unreadable or empty, fresh workbook
+            }
+        }
+        let sheet = wb.getWorksheet('Payments') || wb.getWorksheet('Sheet1') || wb.worksheets[0];
+        if (!sheet) {
+            sheet = wb.addWorksheet('Payments');
+        }
+        if (sheet.rowCount === 0) {
+            sheet.columns = [
+                { header: 'Date', key: 'date', width: 14 },
+                { header: 'Time', key: 'time', width: 12 },
+                { header: 'Customer', key: 'customer', width: 22 },
+                { header: 'Type', key: 'type', width: 20 },
+                { header: 'Amount', key: 'amount', width: 15 },
+                { header: 'Note', key: 'note', width: 30 },
+                { header: 'Source', key: 'source', width: 15 }
+            ];
+            const headerRow = sheet.getRow(1);
+            headerRow.font = { bold: true };
+            headerRow.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFE0E7FF' }
+            };
+        }
+        const displayType = (type === 'payment_received') ? 'Payment Received' : (type === 'credit_given' ? 'Credit Given' : 'Payment Missed');
+        sheet.addRow([date, time, customer, displayType, amount, note || '', source || 'voice']);
+        await wb.xlsx.writeFile(PAYMENTS_XLSX_PATH);
+        logLedger(`payments.xlsx: Saved entry on the spot -> ${customer} ₹${amount}`);
+    } catch (err) {
+        if (err.code === 'EBUSY') {
+            console.warn(`[payments.xlsx] Currently open in Excel (EBUSY). Preserved immediately in payments.csv!`);
+            logLedger(`payments.xlsx: Open in Excel (EBUSY). Preserved in payments.csv`);
+        } else {
+            console.error(`[payments.xlsx] Error:`, err.message);
+        }
+    }
+}
+
 // 1. POST /api/ledger { customer_name, type, amount, date?, note? }
 app.post('/api/ledger', async (req, res) => {
     try {
-        const { customer_name, type, amount, date, note } = req.body || {};
+        const rawCustomer = req.body.customer_name || req.body.customer || req.body.name || req.body.party || '';
+        const rawType = req.body.type || req.body.transaction_type || req.body.action || 'payment_received';
+        const rawAmount = req.body.amount || req.body.amt || req.body.value || req.body.price;
+        const date = req.body.date;
+        const note = req.body.note;
+        const source = req.body.source || 'voice';
 
-        if (!customer_name || typeof customer_name !== 'string' || !customer_name.trim()) {
-            logLedger(`POST /api/ledger - REJECTED: Missing customer_name`);
-            return res.status(400).json({ ok: false, error: 'Customer name is required.' });
+        const customer_name = String(rawCustomer || 'Customer').trim();
+        const type = normalizeTransactionType(rawType);
+        const parsedAmount = parseAmount(rawAmount);
+
+        if (parsedAmount <= 0) {
+            logLedger(`POST /api/ledger - REJECTED: Invalid amount "${rawAmount}"`);
+            return res.status(400).json({ ok: false, error: 'Amount must be greater than zero.' });
         }
 
-        const validTypes = ['credit_given', 'payment_received', 'payment_missed'];
-        if (!type || !validTypes.includes(type)) {
-            logLedger(`POST /api/ledger - REJECTED: Invalid transaction type "${type}"`);
-            return res.status(400).json({
-                ok: false,
-                error: `Invalid transaction type "${type}". Allowed types: credit_given, payment_received, payment_missed.`
-            });
-        }
+        const now = new Date();
+        const dateStr = (date && String(date).split(' ')[0]) || now.toISOString().split('T')[0];
+        const timeStr = now.toTimeString().split(' ')[0];
 
-        const parsedAmount = Number(amount);
-        if (isNaN(parsedAmount) || parsedAmount <= 0) {
-            logLedger(`POST /api/ledger - REJECTED: Invalid amount "${amount}"`);
-            return res.status(400).json({ ok: false, error: 'Amount must be a positive number greater than zero.' });
-        }
+        // 1. Instantly append to payments.csv (never blocked by file locks)
+        appendToPaymentsCsv({
+            customer: customer_name,
+            type,
+            amount: parsedAmount,
+            date: dateStr,
+            time: timeStr,
+            note: note || `Spoken entry: ${customer_name} ${type.replace(/_/g, ' ')} ₹${parsedAmount}`,
+            source
+        });
 
-        const cleanSearch = customer_name.trim().toLowerCase();
+        // 2. Instantly update payments.xlsx
+        await updatePaymentsXlsx({
+            customer: customer_name,
+            type,
+            amount: parsedAmount,
+            date: dateStr,
+            time: timeStr,
+            note: note || `Spoken entry: ${customer_name} ${type.replace(/_/g, ' ')} ₹${parsedAmount}`,
+            source
+        });
+
+        const cleanSearch = customer_name.toLowerCase();
 
         const result = await runInLedgerQueue(async () => {
             await ensureLedgerWorkbook();
@@ -796,55 +915,43 @@ app.post('/api/ledger', async (req, res) => {
             if (!matchedRow) {
                 if (matches.length === 1) {
                     matchedRow = matches[0].row;
-                } else if (matches.length > 1) {
-                    logLedger(`POST /api/ledger - MULTIPLE MATCHES for "${customer_name}": ${matches.map(m => m.name).join(', ')}`);
-                    return {
-                        ok: false,
-                        error: 'Multiple matches',
-                        options: matches.map(m => m.name)
-                    };
                 }
             }
 
-            let customerFinalName = '';
+            let customerFinalName = customer_name;
             let newBalance = 0;
             let warning = undefined;
 
             if (!matchedRow) {
+                // If customer not found in ledger, auto-create so payment NEVER fails!
                 if (type === 'credit_given') {
-                    customerFinalName = customer_name.trim();
                     newBalance = parsedAmount;
-                    custSheet.addRow([customerFinalName, '', newBalance]);
-                    logLedger(`POST /api/ledger - Auto-created customer "${customerFinalName}" with initial credit balance ₹${newBalance}`);
-                } else {
-                    logLedger(`POST /api/ledger - REJECTED: Customer not found "${customer_name}" for ${type}`);
-                    return {
-                        ok: false,
-                        error: `Customer not found: "${customer_name}". Please verify customer name.`
-                    };
+                } else if (type === 'payment_received') {
+                    newBalance = 0;
                 }
+                custSheet.addRow([customerFinalName, '', newBalance]);
+                logLedger(`POST /api/ledger - Auto-created customer "${customerFinalName}" with balance ₹${newBalance}`);
             } else {
                 customerFinalName = String(matchedRow.getCell(1).value || '').trim();
                 const currentBalance = Number(matchedRow.getCell(3).value) || 0;
 
                 if (type === 'credit_given') {
                     newBalance = currentBalance + parsedAmount;
-                    matchedRow.getCell(3).value = newBalance;
                 } else if (type === 'payment_received') {
                     if (parsedAmount > currentBalance) {
                         warning = `Payment amount (₹${parsedAmount}) exceeds outstanding balance (₹${currentBalance}).`;
                     }
                     newBalance = Math.max(0, currentBalance - parsedAmount);
-                    matchedRow.getCell(3).value = newBalance;
                 } else if (type === 'payment_missed') {
                     newBalance = currentBalance;
                 }
+                matchedRow.getCell(3).value = newBalance;
             }
 
             // Append Ledger row (Source = "voice")
-            const entryDate = (date && String(date).trim()) || new Date().toISOString().replace('T', ' ').substring(0, 19);
-            const entryNote = (note && String(note).trim()) || (type === 'payment_missed' ? 'Payment missed / promised date past' : '');
-            ledgerSheet.addRow([entryDate, customerFinalName, type, parsedAmount, entryNote, 'voice']);
+            const entryDate = `${dateStr} ${timeStr}`;
+            const entryNote = (note && String(note).trim()) || (type === 'payment_missed' ? 'Payment missed' : 'Voice transaction');
+            ledgerSheet.addRow([entryDate, customerFinalName, type, parsedAmount, entryNote, source]);
 
             makeLedgerBackup();
             await wb.xlsx.writeFile(LEDGER_PATH);
@@ -857,12 +964,13 @@ app.post('/api/ledger', async (req, res) => {
                 type: type,
                 amount: parsedAmount,
                 new_balance: newBalance,
-                warning: warning
+                warning: warning,
+                file_updated: 'payments.csv & payments.xlsx'
             };
         });
 
         if (!result.ok) {
-            return res.status(result.error === 'Multiple matches' ? 409 : 404).json(result);
+            return res.status(400).json(result);
         }
 
         return res.json(result);
@@ -923,6 +1031,29 @@ app.post('/api/ledger/undo', async (req, res) => {
 
             makeLedgerBackup();
             await wb.xlsx.writeFile(LEDGER_PATH);
+
+            // Log reversal to payments.csv and payments.xlsx
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toTimeString().split(' ')[0];
+            appendToPaymentsCsv({
+                customer: rowCustomer,
+                type: 'undo_reversal',
+                amount: -rowAmount,
+                date: dateStr,
+                time: timeStr,
+                note: `Reversed ${rowType} of ₹${rowAmount}`,
+                source: 'undo'
+            });
+            await updatePaymentsXlsx({
+                customer: rowCustomer,
+                type: 'undo_reversal',
+                amount: -rowAmount,
+                date: dateStr,
+                time: timeStr,
+                note: `Reversed ${rowType} of ₹${rowAmount}`,
+                source: 'undo'
+            });
             logLedger(`POST /api/ledger/undo - SUCCESS: Reverted ${rowType} of ₹${rowAmount} for ${rowCustomer}.`);
 
             return {

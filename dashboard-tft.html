@@ -2293,29 +2293,7 @@
                     </div>
                 </div>
 
-                <!-- =======================================================
-                     RECENT LEDGER ENTRIES PANEL (VOICE BOOKKEEPING)
-                     ======================================================= -->
-                <div class="panel-card home-ledger-panel" id="home-ledger-panel">
-                    <div class="ledger-panel-header">
-                        <div class="ledger-header-left">
-                            <span class="ledger-book-icon">📒</span>
-                            <div>
-                                <span class="panel-title">Recent Voice Bookkeeping Entries</span>
-                                <span class="ledger-sub-text">Synced live with <code>data/ledger.xlsx</code> • ElevenLabs AI Enabled</span>
-                            </div>
-                        </div>
-                        <button class="btn-undo-entry" id="btn-undo-ledger" onclick="undoLastLedgerEntry(event)" title="Undo last transaction">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
-                            <span>UNDO LAST ENTRY</span>
-                        </button>
-                    </div>
 
-                    <!-- 5 Recent Entries List -->
-                    <div class="ledger-entries-list" id="ledger-recent-list">
-                        <div class="ledger-empty-state">Loading recent entries...</div>
-                    </div>
-                </div>
 
                 <!-- =======================================================
                      HOME PAGE VOICE COMMAND COMPONENT (HOME PAGE ONLY)
@@ -3841,6 +3819,38 @@
                 }
             }
 
+            // 2. CHECK FOR DIRECT PAYMENT / BOOKKEEPING INTENT FIRST (e.g. "sharma paid 2k", "anuj paid 5000", "aman borrowed 2k", "sharma ne 2000 diya")
+            const paymentMatch = text.match(/(?:(?:record|add|enter|write)\s+)?([a-z]+)\s+(?:ne\s+)?(paid|de\s*diya|diya|bhara|jama|pay|borrowed|liya|udhaar)\s+(\d+(?:\.\d+)?\s*(?:k|lakh|lac|cr)?)/i) ||
+                                 text.match(/([a-z]+)\s+(\d+(?:\.\d+)?\s*(?:k|lakh|lac|cr)?)\s+(paid|borrowed|jama|diya)/i) ||
+                                 text.match(/(?:payment|paid|received|credit)\s+(?:of\s+)?(\d+(?:\.\d+)?\s*(?:k|lakh|lac|cr)?)\s+(?:from|for|by)\s+([a-z]+)/i);
+
+            if (paymentMatch) {
+                let customer = 'Sharma';
+                let amountStr = '0';
+                let typeStr = 'payment_received';
+
+                if (paymentMatch[1] && paymentMatch[2] && paymentMatch[3]) {
+                    customer = paymentMatch[1];
+                    const actionWord = paymentMatch[2].toLowerCase();
+                    amountStr = paymentMatch[3];
+                    typeStr = (actionWord.includes('borrow') || actionWord.includes('udhaar') || actionWord.includes('liya')) ? 'credit_given' : 'payment_received';
+                } else if (text.includes('from') || text.includes('by') || text.includes('for')) {
+                    amountStr = paymentMatch[1];
+                    customer = paymentMatch[2];
+                }
+
+                // Capitalize customer name
+                customer = customer.charAt(0).toUpperCase() + customer.slice(1);
+
+                return {
+                    action: 'record_payment_direct',
+                    customer: customer,
+                    type: typeStr,
+                    amountStr: amountStr,
+                    text: rawTranscript
+                };
+            }
+
             // Keyword Categories
             const isSupplier = /\b(supplier|suppliers|vendor|vendors|dealers?|traders?|sharma|devi|aarav)\b/i.test(text);
             const isCustomer = /\b(customer|customers|grahak|client|clients|party|parties|ramesh|tejas|meera)\b/i.test(text);
@@ -3895,6 +3905,40 @@
                     cancelVoiceCall();
                     return;
                 }
+            }
+
+            if (parsed.action === 'record_payment_direct') {
+                setVoiceState('processing', `Recording: ${parsed.customer} ${parsed.type === 'credit_given' ? 'credit' : 'payment'} ${parsed.amountStr}...`);
+                fetch('/api/ledger', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customer_name: parsed.customer,
+                        type: parsed.type,
+                        amount: parsed.amountStr,
+                        note: `Spoken: "${rawText}"`,
+                        source: 'mic'
+                    })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.ok) {
+                        const numAmt = data.amount || parsed.amountStr;
+                        showLedgerToast(`Saved: ${data.customer} paid ₹${Number(numAmt).toLocaleString('en-IN')} (Added to payments.csv)`, true);
+                        speakVoiceFeedback(`${data.customer}'s payment of ${numAmt} has been added on the spot to payments excel.`);
+                        refreshDashboardSummary();
+                        setTimeout(() => resetVoiceState(), 2500);
+                    } else {
+                        showLedgerToast(`Failed: ${data.error}`, false);
+                        speakVoiceFeedback(`Could not save payment. ${data.error}`);
+                        setTimeout(() => resetVoiceState(), 2500);
+                    }
+                })
+                .catch(err => {
+                    showLedgerToast(`Network error: ${err.message}`, false);
+                    setTimeout(() => resetVoiceState(), 2500);
+                });
+                return;
             }
 
             if (parsed.action === 'talk_advisor') {
@@ -4366,7 +4410,7 @@
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
 
-        // Attach Client Tool: record_transaction to ElevenLabs widget
+        // Attach Client Tools to ElevenLabs widget
         function attachElevenLabsClientTools() {
             const widgets = document.querySelectorAll("elevenlabs-convai");
             widgets.forEach(widget => {
@@ -4379,55 +4423,63 @@
 
                     event.detail.config.clientTools = event.detail.config.clientTools || {};
 
-                    // Client Tool Name must be exactly record_transaction (case-sensitive)
-                    event.detail.config.clientTools.record_transaction = async ({ customer_name, type, amount, date, note }) => {
-                        console.log("[Client Tool: record_transaction triggered by ElevenLabs]", { customer_name, type, amount, date, note });
+                    const handlePaymentTool = async (args = {}) => {
+                        console.log("[Client Tool Triggered by ElevenLabs]", args);
+                        const customer = args.customer_name || args.customer || args.name || args.party || 'Customer';
+                        const amount = args.amount || args.amt || args.value || 0;
+                        const type = args.type || 'payment_received';
+                        const note = args.note || 'Spoken during ElevenLabs call';
+
                         try {
                             const res = await fetch('/api/ledger', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({
-                                    customer_name: customer_name,
+                                    customer_name: customer,
                                     type: type,
-                                    amount: Number(amount),
-                                    date: date,
-                                    note: note
+                                    amount: amount,
+                                    date: args.date,
+                                    note: note,
+                                    source: 'elevenlabs'
                                 })
                             });
                             const data = await res.json();
 
                             if (res.ok && data.ok) {
-                                const numAmt = Number(amount) || 0;
-                                const sign = (type === 'credit_given') ? '+' : (type === 'payment_received' ? '-' : '•');
-                                const toastMsg = `Saved: ${data.customer} ${sign}₹${numAmt.toLocaleString('en-IN')}`;
-                                showLedgerToast(toastMsg, true);
-
-                                // Refresh dashboard cards without reload
+                                const numAmt = data.amount || amount;
+                                const actionVerb = (type === 'credit_given') ? 'borrowed' : 'paid';
+                                showLedgerToast(`Saved: ${data.customer} ${actionVerb} ₹${Number(numAmt).toLocaleString('en-IN')} (Added to payments.csv & Excel)`, true);
                                 refreshDashboardSummary();
-                                loadRecentLedgerEntries();
 
                                 const resultPayload = {
                                     ok: true,
                                     customer: data.customer,
+                                    amount: numAmt,
                                     new_balance: data.new_balance,
-                                    message: `Recorded ${type.replace(/_/g, ' ')} of ₹${numAmt} for ${data.customer}. New balance is ₹${data.new_balance}.`
+                                    message: `Recorded ${data.customer} ${actionVerb} ₹${numAmt} on the spot into the payments Excel and CSV sheet.`
                                 };
                                 return JSON.stringify(resultPayload);
                             } else {
                                 const errMsg = data.error || 'Failed to record transaction';
                                 showLedgerToast(`Failed: ${errMsg}`, false);
-                                return JSON.stringify({
-                                    ok: false,
-                                    error: errMsg,
-                                    options: data.options || []
-                                });
+                                return JSON.stringify({ ok: false, error: errMsg });
                             }
                         } catch (netErr) {
-                            console.error('[record_transaction Net Error]', netErr);
-                            showLedgerToast(`Failed: ${netErr.message}`, false);
+                            console.error('[Client Tool Net Error]', netErr);
+                            showLedgerToast(`Error: ${netErr.message}`, false);
                             return JSON.stringify({ ok: false, error: netErr.message });
                         }
                     };
+
+                    // Register multiple tool name aliases so any config in ElevenLabs triggers on the spot
+                    event.detail.config.clientTools.record_transaction = handlePaymentTool;
+                    event.detail.config.clientTools.record_payment = handlePaymentTool;
+                    event.detail.config.clientTools.add_payment = handlePaymentTool;
+                    event.detail.config.clientTools.payment = handlePaymentTool;
+                    event.detail.config.clientTools.recordTransaction = handlePaymentTool;
+                    event.detail.config.clientTools.recordPayment = handlePaymentTool;
+                    event.detail.config.clientTools.addPayment = handlePaymentTool;
+                    event.detail.config.clientTools.bookkeeping = handlePaymentTool;
                 });
             });
         }
