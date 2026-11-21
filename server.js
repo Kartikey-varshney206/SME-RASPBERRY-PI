@@ -1171,13 +1171,32 @@ app.use(express.static(path.join(__dirname), {
     }
 }));
 
+// Helper: Get local network IP
+function getLanIp() {
+    try {
+        const nets = os.networkInterfaces();
+        for (const name of Object.keys(nets)) {
+            for (const net of nets[name]) {
+                if ((net.family === 'IPv4' || net.family === 4) && !net.internal) {
+                    return net.address;
+                }
+            }
+        }
+    } catch (e) {}
+    return 'localhost';
+}
+
 // Start Express Server
 app.listen(PORT, () => {
+    const lanIp = getLanIp();
     console.log(`========================================================`);
     console.log(` SME Growth Advisor - Voice Telephony Server Active`);
-    console.log(` Running on: http://localhost:${PORT}`);
-    console.log(` TFT UI URL: http://localhost:${PORT}/dashboard-tft.html`);
-    console.log(` Test Mode : ${process.env.TEST_MODE === 'true' ? 'ENABLED (Calls to ' + process.env.TEST_PHONE_NUMBER + ')' : 'DISABLED'}`);
+    console.log(` Localhost  : http://localhost:${PORT}`);
+    console.log(` LAN Network: http://${lanIp}:${PORT}`);
+    console.log(` TFT UI URL : http://localhost:${PORT}/dashboard-tft.html`);
+    console.log(` WebRTC Note: On Raspberry Pi, microphone requires either`);
+    console.log(`              http://localhost:${PORT} or the HTTPS tunnel URL.`);
+    console.log(` Test Mode  : ${process.env.TEST_MODE === 'true' ? 'ENABLED (Calls to ' + process.env.TEST_PHONE_NUMBER + ')' : 'DISABLED'}`);
     console.log(` Business Hours: ${process.env.CALL_WINDOW_START_HOUR || 9}:00 to ${process.env.CALL_WINDOW_END_HOUR || 19}:00`);
     console.log(`========================================================`);
 });

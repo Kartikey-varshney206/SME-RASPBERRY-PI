@@ -4,6 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SME Growth Advisor - TFT & Screen-Mirror Edition</title>
+    <!-- =====================================================================
+         WEBRTC & MEDIA-DEVICES SHIM / POLYFILL FOR RASPBERRY PI & EMBEDDED TFT
+         Fixes: "Cannot read properties of undefined (reading 'getUserMedia')"
+         ===================================================================== -->
+    <script>
+        (function() {
+            try {
+                if (typeof window === 'undefined') return;
+                var nav = window.navigator || {};
+
+                // 1. Ensure navigator.mediaDevices object exists
+                if (!nav.mediaDevices) {
+                    try {
+                        Object.defineProperty(nav, 'mediaDevices', {
+                            value: {},
+                            writable: true,
+                            configurable: true
+                        });
+                    } catch (e1) {
+                        try { nav.mediaDevices = {}; } catch (e2) {}
+                    }
+                }
+
+                if (nav.mediaDevices && !nav.mediaDevices.getUserMedia) {
+                    // 2. Check legacy browser vendor prefixes (older Chromium / WebKit on Pi)
+                    var legacyGUM = nav.getUserMedia ||
+                                    nav.webkitGetUserMedia ||
+                                    nav.mozGetUserMedia ||
+                                    nav.msGetUserMedia;
+
+                    var gumFn;
+                    if (legacyGUM) {
+                        gumFn = function(constraints) {
+                            return new Promise(function(resolve, reject) {
+                                legacyGUM.call(nav, constraints, resolve, reject);
+                            });
+                        };
+                    } else {
+                        // 3. Fallback: If in insecure context (e.g. http://192.168.x.x:3000) or missing mic,
+                        // create a silent dummy audio stream via AudioContext so ElevenLabs doesn't crash on load
+                        gumFn = function(constraints) {
+                            return new Promise(function(resolve, reject) {
+                                try {
+                                    var AudioCtx = window.AudioContext || window.webkitAudioContext;
+                                    if (AudioCtx) {
+                                        var ctx = new AudioCtx();
+                                        var dst = ctx.createMediaStreamDestination();
+                                        var osc = ctx.createOscillator();
+                                        var gain = ctx.createGain();
+                                        gain.gain.value = 0.0001; // Silent stream
+                                        osc.connect(gain);
+                                        gain.connect(dst);
+                                        osc.start();
+                                        var tracks = dst.stream.getAudioTracks();
+                                        if (tracks && tracks.length > 0) {
+                                            console.log('[WebRTC Shim] Provided fallback audio stream for ElevenLabs widget.');
+                                            return resolve(dst.stream);
+                                        }
+                                    }
+                                } catch (ctxErr) {
+                                    console.warn('[WebRTC Shim Context Warning]', ctxErr);
+                                }
+                                var isSecure = window.isSecureContext ||
+                                               window.location.hostname === 'localhost' ||
+                                               window.location.hostname === '127.0.0.1' ||
+                                               window.location.protocol === 'https:';
+                                if (!isSecure) {
+                                    reject(new DOMException('Microphone requires HTTPS or localhost:3000', 'NotAllowedError'));
+                                } else {
+                                    reject(new DOMException('No microphone found', 'NotFoundError'));
+                                }
+                            });
+                        };
+                    }
+
+                    try {
+                        Object.defineProperty(nav.mediaDevices, 'getUserMedia', {
+                            value: gumFn,
+                            writable: true,
+                            configurable: true
+                        });
+                    } catch (e3) {
+                        try { nav.mediaDevices.getUserMedia = gumFn; } catch (e4) {}
+                    }
+                }
+
+                // Ensure enumerateDevices exists
+                if (nav.mediaDevices && !nav.mediaDevices.enumerateDevices) {
+                    var enumFn = function() {
+                        return Promise.resolve([
+                            { deviceId: 'default', kind: 'audioinput', label: 'Default Microphone', groupId: 'default' }
+                        ]);
+                    };
+                    try {
+                        Object.defineProperty(nav.mediaDevices, 'enumerateDevices', {
+                            value: enumFn,
+                            writable: true,
+                            configurable: true
+                        });
+                    } catch (e5) {
+                        try { nav.mediaDevices.enumerateDevices = enumFn; } catch (e6) {}
+                    }
+                }
+            } catch (globalErr) {
+                console.warn('[WebRTC Global Shim Warning]', globalErr);
+            }
+        })();
+    </script>
     <style>
         /* =====================================================================
            GLOBAL RESET & FULLSCREEN FLUID RESPONSIVENESS
