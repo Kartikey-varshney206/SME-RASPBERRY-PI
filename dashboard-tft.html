@@ -152,8 +152,8 @@
             background: transparent;
             border: none;
             color: #94a3b8;
-            font-size: clamp(11px, 0.95vw, 14px);
-            font-weight: 600;
+            font-size: clamp(13px, 1.1vw, 16px);
+            font-weight: 700;
             text-align: left;
             cursor: pointer;
             transition: background var(--anim-speed) ease, color var(--anim-speed) ease, transform 0.1s ease;
@@ -167,8 +167,8 @@
             box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
         }
         .nav-btn svg {
-            width: clamp(17px, 1.4vw, 22px);
-            height: clamp(17px, 1.4vw, 22px);
+            width: clamp(19px, 1.6vw, 24px);
+            height: clamp(19px, 1.6vw, 24px);
             fill: currentColor;
             flex-shrink: 0;
         }
@@ -238,38 +238,38 @@
 
         /* TOP HEADER */
         #top-header {
-            height: clamp(36px, 6vh, 56px);
+            height: clamp(42px, 6.5vh, 60px);
             background: #ffffff;
             border-bottom: 1px solid var(--card-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 clamp(10px, 1.5vw, 24px);
+            padding: 0 clamp(12px, 1.6vw, 28px);
             flex-shrink: 0;
             z-index: 20;
         }
         .header-greeting {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: clamp(13px, 1.3vw, 20px);
+            gap: 8px;
+            font-size: clamp(16px, 1.6vw, 24px);
             font-weight: 800;
             color: var(--text-dark);
-            letter-spacing: -0.2px;
+            letter-spacing: -0.3px;
         }
         .header-pill-btn {
             background: var(--purple-bg);
             color: #4338ca;
             border: 1px solid #ddd6fe;
             border-radius: 16px;
-            padding: 4px clamp(10px, 1.2vw, 18px);
-            font-size: clamp(11px, 0.95vw, 14px);
-            font-weight: 600;
+            padding: 6px clamp(12px, 1.3vw, 20px);
+            font-size: clamp(13px, 1.1vw, 16px);
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
             cursor: pointer;
-            height: clamp(26px, 4vh, 36px);
+            height: clamp(30px, 4.4vh, 40px);
         }
         .header-pill-btn:active {
             transform: scale(0.96);
@@ -503,49 +503,66 @@
         .kpi-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: clamp(6px, 1vw, 16px);
+            gap: clamp(10px, 1.4vw, 20px);
             flex: 1.05;
-            min-height: 0;
+            min-height: 130px;
         }
 
         .kpi-card {
-            border-radius: 12px;
-            padding: clamp(6px, 1.5vh, 18px) clamp(8px, 1.4vw, 20px);
+            border-radius: 16px;
+            padding: clamp(12px, 1.8vh, 20px) clamp(14px, 1.6vw, 24px);
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            align-items: center;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
             border-width: 1px;
             border-style: solid;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
         }
         .kpi-revenue {
-            background: linear-gradient(180deg, #f3f5ff 0%, #e8ecfc 100%);
+            background: linear-gradient(135deg, #f4f7ff 0%, #ebf1fe 100%);
             border-color: #dbe4ff;
         }
         .kpi-profit {
-            background: linear-gradient(180deg, #f0fdf4 0%, #e2f8ec 100%);
+            background: linear-gradient(135deg, #f0fdf4 0%, #e2f8ec 100%);
             border-color: #dcfce7;
         }
         .kpi-receivables {
-            background: linear-gradient(180deg, #fff9f0 0%, #ffeedc 100%);
+            background: linear-gradient(135deg, #fff9f0 0%, #ffeedc 100%);
             border-color: #fed7aa;
+        }
+
+        .kpi-left-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            gap: clamp(6px, 1vh, 10px);
+            z-index: 2;
+            flex: 1;
+            min-width: 0;
         }
 
         .kpi-head {
             display: flex;
             align-items: center;
-            gap: clamp(5px, 0.7vw, 10px);
+            gap: clamp(8px, 0.9vw, 12px);
         }
         .kpi-badge-icon {
-            width: clamp(22px, 2.2vw, 36px);
-            height: clamp(22px, 2.2vw, 36px);
-            border-radius: 8px;
+            width: clamp(30px, 2.7vw, 42px);
+            height: clamp(30px, 2.7vw, 42px);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(12px, 1.3vw, 18px);
+            font-size: clamp(16px, 1.5vw, 22px);
             font-weight: 800;
             flex-shrink: 0;
         }
@@ -554,66 +571,121 @@
         .kpi-receivables .kpi-badge-icon { background: #ffedd5; color: #c2410c; }
 
         .kpi-title {
-            font-size: clamp(10px, 0.95vw, 14px);
-            color: var(--text-muted);
-            font-weight: 500;
+            font-size: clamp(14px, 1.25vw, 18px);
+            color: #475569;
+            font-weight: 700;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         .kpi-val {
-            font-size: clamp(17px, 2.3vw, 34px);
-            font-weight: 800;
+            font-size: clamp(26px, 2.7vw, 40px);
+            font-weight: 900;
             color: var(--text-dark);
             line-height: 1.1;
-            letter-spacing: -0.4px;
+            letter-spacing: -0.6px;
         }
         .kpi-trend {
-            font-size: clamp(9.5px, 0.9vw, 13.5px);
-            font-weight: 700;
+            font-size: clamp(13px, 1.15vw, 16px);
+            font-weight: 800;
             color: var(--green);
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
+        }
+
+        /* Sparkline Graph Area in KPI Card */
+        .kpi-sparkline-wrap {
+            width: clamp(95px, 12vw, 160px);
+            height: clamp(52px, 8vh, 85px);
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .sparkline-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+        .spark-path-line {
+            fill: none;
+            stroke-width: 3.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 260;
+            stroke-dashoffset: 260;
+            animation: sparklineDraw 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .kpi-revenue .spark-path-line { stroke: #2563eb; }
+        .kpi-profit .spark-path-line { stroke: #16a34a; }
+        .kpi-receivables .spark-path-line { stroke: #ea580c; }
+
+        .spark-path-area {
+            opacity: 0;
+            animation: sparkAreaFade 1.2s ease-out 0.3s forwards;
+        }
+        .spark-dot-outer {
+            animation: sparkDotPulse 2s infinite ease-in-out;
+            transform-origin: center;
+        }
+        @keyframes sparklineDraw {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes sparkAreaFade {
+            to { opacity: 1; }
+        }
+        @keyframes sparkDotPulse {
+            0%, 100% { transform: scale(1); opacity: 0.85; }
+            50% { transform: scale(1.35); opacity: 0.35; }
         }
 
         /* ROW 2: Health Score & Supplier Intelligence */
         .mid-row {
             display: grid;
-            grid-template-columns: 1.1fr 1.35fr;
-            gap: clamp(6px, 1vw, 16px);
-            flex: 1.45;
-            min-height: 0;
+            grid-template-columns: 1.15fr 1.35fr;
+            gap: clamp(10px, 1.4vw, 20px);
+            flex: 1.6;
+            min-height: 270px;
         }
 
         .panel-card {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: clamp(6px, 1.5vh, 18px) clamp(8px, 1.4vw, 22px);
+            border-radius: 16px;
+            padding: clamp(14px, 2vh, 22px) clamp(16px, 1.8vw, 26px);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
             position: relative;
+            transition: box-shadow 0.2s ease;
+        }
+        .panel-card:hover {
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
         }
 
         .panel-title {
-            font-size: clamp(11px, 1.15vw, 17px);
-            font-weight: 700;
+            font-size: clamp(17px, 1.55vw, 23px);
+            font-weight: 800;
             color: var(--text-dark);
+            letter-spacing: -0.2px;
         }
 
-        /* Health Score Content */
+        /* Health Score Content - 3 columns */
         .health-body {
             display: flex;
             align-items: center;
-            gap: clamp(8px, 1.4vw, 20px);
+            justify-content: space-between;
+            gap: clamp(10px, 1.5vw, 24px);
             flex: 1;
+            padding: clamp(6px, 1vh, 12px) 0;
         }
         .gauge-wrap {
-            width: clamp(62px, 8.5vw, 115px);
-            height: clamp(62px, 8.5vw, 115px);
+            width: clamp(75px, 8.5vw, 120px);
+            height: clamp(75px, 8.5vw, 120px);
             position: relative;
             flex-shrink: 0;
         }
@@ -625,16 +697,16 @@
         .gauge-bg {
             fill: none;
             stroke: #e2e8f0;
-            stroke-width: 6;
+            stroke-width: 6.5;
         }
         .gauge-bar {
             fill: none;
             stroke: var(--navy-active);
-            stroke-width: 6;
+            stroke-width: 6.5;
             stroke-linecap: round;
             stroke-dasharray: 163.36;
             stroke-dashoffset: 29.4;
-            transition: stroke-dashoffset 1s ease-out;
+            transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .gauge-center-text {
             position: absolute;
@@ -648,43 +720,97 @@
             justify-content: center;
         }
         .gauge-num {
-            font-size: clamp(18px, 2.3vw, 36px);
-            font-weight: 800;
+            font-size: clamp(28px, 3.2vw, 44px);
+            font-weight: 900;
             color: var(--text-dark);
             line-height: 1;
+            letter-spacing: -0.5px;
         }
         .gauge-denom {
-            font-size: clamp(8px, 0.9vw, 14px);
+            font-size: clamp(12px, 1.1vw, 16px);
             color: var(--text-muted);
-            font-weight: 600;
+            font-weight: 700;
+            margin-top: 2px;
         }
 
+        /* Column 2: Health Stats */
         .health-stats {
             display: flex;
             flex-direction: column;
-            gap: clamp(2.5px, 0.7vh, 8px);
+            gap: clamp(6px, 1vh, 12px);
             flex: 1;
-            font-size: clamp(9.5px, 0.95vw, 14px);
+            font-size: clamp(13px, 1.15vw, 16px);
+            min-width: 120px;
         }
         .stat-line {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
         }
         .stat-label-wrap {
             display: flex;
             align-items: center;
-            gap: 5px;
-            color: var(--text-sub);
+            gap: 7px;
+            color: #334155;
+            font-weight: 600;
         }
         .stat-dot {
-            width: clamp(6px, 0.6vw, 9px);
-            height: clamp(6px, 0.6vw, 9px);
+            width: clamp(7px, 0.7vw, 10px);
+            height: clamp(7px, 0.7vw, 10px);
             border-radius: 50%;
+            flex-shrink: 0;
         }
         .stat-val {
             font-weight: 800;
             color: var(--text-dark);
+            font-size: clamp(14px, 1.25vw, 18px);
+        }
+
+        /* Column 3: Rising 3D Bar Chart with Trend Arrow */
+        .health-chart-col {
+            width: clamp(85px, 10.5vw, 145px);
+            height: clamp(80px, 9.5vw, 125px);
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .health-bars-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+        .rising-bar {
+            transform-origin: bottom;
+            animation: barRiseAnim 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .bar-1 { animation-delay: 0.1s; }
+        .bar-2 { animation-delay: 0.2s; }
+        .bar-3 { animation-delay: 0.3s; }
+        .bar-4 { animation-delay: 0.4s; }
+        .bar-5 { animation-delay: 0.5s; }
+
+        @keyframes barRiseAnim {
+            from { transform: scaleY(0); opacity: 0.3; }
+            to { transform: scaleY(1); opacity: 1; }
+        }
+
+        .trend-arrow-path {
+            stroke-dasharray: 180;
+            stroke-dashoffset: 180;
+            animation: arrowDrawAnim 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+        .trend-arrowhead {
+            opacity: 0;
+            animation: arrowHeadFade 0.4s ease-out 1.7s forwards;
+        }
+        @keyframes arrowDrawAnim {
+            to { stroke-dashoffset: 0; }
+        }
+        @keyframes arrowHeadFade {
+            to { opacity: 1; }
         }
 
         /* Supplier Intelligence Card */
@@ -696,55 +822,99 @@
         .new-pill {
             background: #dcfce7;
             color: #15803d;
-            font-size: clamp(9px, 0.85vw, 13px);
+            font-size: clamp(12px, 1vw, 15px);
             font-weight: 700;
-            padding: 2px clamp(6px, 0.8vw, 10px);
-            border-radius: 8px;
+            padding: 4px clamp(8px, 1vw, 14px);
+            border-radius: 12px;
+            letter-spacing: 0.2px;
         }
         .pricing-desc {
-            font-size: clamp(10px, 1vw, 15px);
+            font-size: clamp(13px, 1.15vw, 16px);
             color: var(--text-sub);
-            margin: 2px 0;
-            line-height: 1.3;
+            margin: 4px 0 8px 0;
+            line-height: 1.4;
+            font-weight: 500;
         }
+
+        /* Area Line Chart */
+        .supplier-chart-container {
+            width: 100%;
+            height: clamp(110px, 13vh, 160px);
+            position: relative;
+            margin: 4px 0;
+        }
+        .supplier-area-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+        .supplier-curve-line {
+            stroke-dasharray: 600;
+            stroke-dashoffset: 600;
+            animation: supplierLineDraw 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .supplier-area-fill {
+            opacity: 0;
+            animation: sparkAreaFade 1.2s ease-out 0.6s forwards;
+        }
+        @keyframes supplierLineDraw {
+            to { stroke-dashoffset: 0; }
+        }
+        .supplier-node-dot {
+            animation: nodePulseAnim 2.5s infinite ease-in-out;
+            transform-origin: center;
+        }
+        @keyframes nodePulseAnim {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
         .pricing-bottom {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: auto;
+            margin-top: 6px;
         }
         .pricing-number-wrap {
             display: flex;
             align-items: baseline;
-            gap: 4px;
+            gap: 8px;
         }
         .pricing-main-amt {
-            font-size: clamp(14px, 1.8vw, 26px);
-            font-weight: 800;
+            font-size: clamp(26px, 2.7vw, 38px);
+            font-weight: 900;
             color: var(--text-dark);
+            line-height: 1;
+            letter-spacing: -0.5px;
         }
         .pricing-upside {
-            font-size: clamp(10px, 1vw, 15px);
-            font-weight: 700;
+            font-size: clamp(15px, 1.3vw, 20px);
+            font-weight: 800;
             color: var(--green);
         }
         .btn-view-agent {
             background: var(--navy-active);
             color: #ffffff;
             border: none;
-            border-radius: 8px;
-            padding: clamp(5px, 1vh, 10px) clamp(11px, 1.4vw, 20px);
-            font-size: clamp(11px, 1vw, 15px);
+            border-radius: 10px;
+            padding: clamp(6px, 1.2vh, 12px) clamp(14px, 1.6vw, 24px);
+            font-size: clamp(13px, 1.1vw, 16px);
             font-weight: 700;
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
-            min-height: clamp(28px, 4.2vh, 42px);
+            box-shadow: 0 3px 10px rgba(37, 99, 235, 0.28);
+            min-height: clamp(32px, 4.6vh, 46px);
             display: flex;
             align-items: center;
+            gap: 6px;
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+        .btn-view-agent:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
         }
         .btn-view-agent:active {
-            transform: scale(0.95);
-            background: #1d4ed8;
+            transform: scale(0.96);
+            background: #1e40af;
         }
 
         /* ROW 3: 4 Mini Cards */
@@ -2242,45 +2412,103 @@
                 <div class="kpi-row">
                     <!-- Total Revenue -->
                     <div class="kpi-card kpi-revenue">
-                        <div class="kpi-head">
-                            <div class="kpi-badge-icon">₹</div>
-                            <span class="kpi-title">Total Revenue</span>
+                        <div class="kpi-left-content">
+                            <div class="kpi-head">
+                                <div class="kpi-badge-icon">₹</div>
+                                <span class="kpi-title">Total Revenue</span>
+                            </div>
+                            <div class="kpi-val" id="kpi-rev-val">₹4,85,230</div>
+                            <div class="kpi-trend">↑ 18.6% MoM</div>
                         </div>
-                        <div class="kpi-val" id="kpi-rev-val">₹4,85,230</div>
-                        <div class="kpi-trend">↑ 18.6% MoM</div>
+                        <div class="kpi-sparkline-wrap">
+                            <svg class="sparkline-svg" viewBox="0 0 160 65" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="grad-rev" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#2563eb" stop-opacity="0.35"/>
+                                        <stop offset="100%" stop-color="#2563eb" stop-opacity="0.0"/>
+                                    </linearGradient>
+                                    <filter id="dotGlowRev" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#2563eb" flood-opacity="0.6"/>
+                                    </filter>
+                                </defs>
+                                <path class="spark-path-area" d="M 0,42 C 20,42 32,52 50,52 C 72,52 82,32 102,32 C 120,32 132,48 144,48 C 150,48 155,24 160,16 L 160,65 L 0,65 Z" fill="url(#grad-rev)"/>
+                                <path class="spark-path-line" d="M 0,42 C 20,42 32,52 50,52 C 72,52 82,32 102,32 C 120,32 132,48 144,48 C 150,48 155,24 160,16"/>
+                                <circle class="spark-dot-outer" cx="160" cy="16" r="8" fill="none" stroke="#2563eb" stroke-width="2"/>
+                                <circle cx="160" cy="16" r="4.5" fill="#2563eb" filter="url(#dotGlowRev)"/>
+                            </svg>
+                        </div>
                     </div>
 
                     <!-- Net Profit -->
                     <div class="kpi-card kpi-profit">
-                        <div class="kpi-head">
-                            <div class="kpi-badge-icon">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                        <div class="kpi-left-content">
+                            <div class="kpi-head">
+                                <div class="kpi-badge-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                                </div>
+                                <span class="kpi-title">Net Profit</span>
                             </div>
-                            <span class="kpi-title">Net Profit</span>
+                            <div class="kpi-val" id="kpi-profit-val">₹1,25,420</div>
+                            <div class="kpi-trend">↑ 15.3% MoM</div>
                         </div>
-                        <div class="kpi-val" id="kpi-profit-val">₹1,25,420</div>
-                        <div class="kpi-trend">↑ 15.3% MoM</div>
+                        <div class="kpi-sparkline-wrap">
+                            <svg class="sparkline-svg" viewBox="0 0 160 65" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="grad-profit" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#16a34a" stop-opacity="0.35"/>
+                                        <stop offset="100%" stop-color="#16a34a" stop-opacity="0.0"/>
+                                    </linearGradient>
+                                    <filter id="dotGlowProfit" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#16a34a" flood-opacity="0.6"/>
+                                    </filter>
+                                </defs>
+                                <path class="spark-path-area" d="M 0,42 C 20,42 32,52 50,52 C 72,52 82,32 102,32 C 120,32 132,48 144,48 C 150,48 155,24 160,16 L 160,65 L 0,65 Z" fill="url(#grad-profit)"/>
+                                <path class="spark-path-line" d="M 0,42 C 20,42 32,52 50,52 C 72,52 82,32 102,32 C 120,32 132,48 144,48 C 150,48 155,24 160,16"/>
+                                <circle class="spark-dot-outer" cx="160" cy="16" r="8" fill="none" stroke="#16a34a" stroke-width="2"/>
+                                <circle cx="160" cy="16" r="4.5" fill="#16a34a" filter="url(#dotGlowProfit)"/>
+                            </svg>
+                        </div>
                     </div>
 
                     <!-- Pending Receivables -->
                     <div class="kpi-card kpi-receivables">
-                        <div class="kpi-head">
-                            <div class="kpi-badge-icon">
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/><circle cx="8" cy="12" r="2"/></svg>
+                        <div class="kpi-left-content">
+                            <div class="kpi-head">
+                                <div class="kpi-badge-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/><path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/><circle cx="8" cy="12" r="2"/></svg>
+                                </div>
+                                <span class="kpi-title">Pending Receivables</span>
                             </div>
-                            <span class="kpi-title">Pending Receivables</span>
+                            <div class="kpi-val" id="kpi-rec-val">₹96,850</div>
+                            <div class="kpi-trend">↑ 12.4% MoM</div>
                         </div>
-                        <div class="kpi-val" id="kpi-rec-val">₹96,850</div>
-                        <div class="kpi-trend">↑ 12.4% MoM</div>
+                        <div class="kpi-sparkline-wrap">
+                            <svg class="sparkline-svg" viewBox="0 0 160 65" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="grad-rec" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#ea580c" stop-opacity="0.35"/>
+                                        <stop offset="100%" stop-color="#ea580c" stop-opacity="0.0"/>
+                                    </linearGradient>
+                                    <filter id="dotGlowRec" x="-50%" y="-50%" width="200%" height="200%">
+                                        <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#ea580c" flood-opacity="0.6"/>
+                                    </filter>
+                                </defs>
+                                <path class="spark-path-area" d="M 0,42 C 20,42 32,52 50,52 C 72,52 82,32 102,32 C 120,32 132,48 144,48 C 150,48 155,24 160,16 L 160,65 L 0,65 Z" fill="url(#grad-rec)"/>
+                                <path class="spark-path-line" d="M 0,42 C 20,42 32,52 50,52 C 72,52 82,32 102,32 C 120,32 132,48 144,48 C 150,48 155,24 160,16"/>
+                                <circle class="spark-dot-outer" cx="160" cy="16" r="8" fill="none" stroke="#ea580c" stroke-width="2"/>
+                                <circle cx="160" cy="16" r="4.5" fill="#ea580c" filter="url(#dotGlowRec)"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
 
                 <!-- ROW 2: Business Health Score + Supplier Intelligence -->
                 <div class="mid-row">
-                    <!-- Health Score -->
+                    <!-- Business Health Score -->
                     <div class="panel-card">
                         <span class="panel-title">Business Health Score</span>
                         <div class="health-body">
+                            <!-- Col 1: Circular Gauge Donut -->
                             <div class="gauge-wrap">
                                 <svg class="gauge-svg" viewBox="0 0 60 60">
                                     <circle class="gauge-bg" cx="30" cy="30" r="26"/>
@@ -2291,6 +2519,8 @@
                                     <span class="gauge-denom">/100</span>
                                 </div>
                             </div>
+
+                            <!-- Col 2: Breakdown 4 metrics -->
                             <div class="health-stats">
                                 <div class="stat-line">
                                     <div class="stat-label-wrap">
@@ -2301,43 +2531,154 @@
                                 </div>
                                 <div class="stat-line">
                                     <div class="stat-label-wrap">
-                                        <span class="stat-dot" style="background:#334155"></span>
+                                        <span class="stat-dot" style="background:#f97316"></span>
                                         <span>Liquidity</span>
                                     </div>
                                     <span class="stat-val">80</span>
                                 </div>
                                 <div class="stat-line">
                                     <div class="stat-label-wrap">
-                                        <span class="stat-dot" style="background:#eab308"></span>
+                                        <span class="stat-dot" style="background:#22c55e"></span>
                                         <span>Operations</span>
                                     </div>
                                     <span class="stat-val">78</span>
                                 </div>
                                 <div class="stat-line">
                                     <div class="stat-label-wrap">
-                                        <span class="stat-dot" style="background:#2563eb"></span>
+                                        <span class="stat-dot" style="background:#8b5cf6"></span>
                                         <span>Growth</span>
                                     </div>
                                     <span class="stat-val">85</span>
                                 </div>
                             </div>
+
+                            <!-- Col 3: Rising 3D Bar Chart with Trend Arrow ↗ -->
+                            <div class="health-chart-col">
+                                <svg class="health-bars-svg" viewBox="0 0 130 95" preserveAspectRatio="xMidYMid meet">
+                                    <defs>
+                                        <linearGradient id="barGrad1" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#bfdbfe"/>
+                                            <stop offset="100%" stop-color="#dbeafe"/>
+                                        </linearGradient>
+                                        <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#93c5fd"/>
+                                            <stop offset="100%" stop-color="#bfdbfe"/>
+                                        </linearGradient>
+                                        <linearGradient id="barGrad3" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#60a5fa"/>
+                                            <stop offset="100%" stop-color="#93c5fd"/>
+                                        </linearGradient>
+                                        <linearGradient id="barGrad4" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#3b82f6"/>
+                                            <stop offset="100%" stop-color="#60a5fa"/>
+                                        </linearGradient>
+                                        <linearGradient id="barGrad5" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#2563eb"/>
+                                            <stop offset="100%" stop-color="#3b82f6"/>
+                                        </linearGradient>
+                                        <filter id="arrowGlow" x="-30%" y="-30%" width="160%" height="160%">
+                                            <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#2563eb" flood-opacity="0.35"/>
+                                        </filter>
+                                    </defs>
+                                    
+                                    <!-- 5 Rising Bars -->
+                                    <rect class="rising-bar bar-1" x="10" y="65" width="13" height="26" rx="3.5" fill="url(#barGrad1)"/>
+                                    <rect class="rising-bar bar-2" x="31" y="50" width="13" height="41" rx="3.5" fill="url(#barGrad2)"/>
+                                    <rect class="rising-bar bar-3" x="52" y="37" width="13" height="54" rx="3.5" fill="url(#barGrad3)"/>
+                                    <rect class="rising-bar bar-4" x="73" y="24" width="13" height="67" rx="3.5" fill="url(#barGrad4)"/>
+                                    <rect class="rising-bar bar-5" x="94" y="11" width="13" height="80" rx="3.5" fill="url(#barGrad5)"/>
+
+                                    <!-- Ascending Curved Trend Arrow ↗ -->
+                                    <path class="trend-arrow-path" d="M 4,75 C 28,73 60,56 108,16" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" filter="url(#arrowGlow)"/>
+                                    <polygon class="trend-arrowhead" points="112,12 102,22 114,20" fill="#2563eb" filter="url(#arrowGlow)"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Supplier Intelligence Card -->
+                    <!-- Supplier Intelligence (AI) Card -->
                     <div class="panel-card">
                         <div class="pricing-head">
                             <span class="panel-title">Supplier Intelligence (AI)</span>
                             <span class="new-pill">Active</span>
                         </div>
-                        <p class="pricing-desc">40 active suppliers • 1-tap quote follow-up calls ready.</p>
+                        <p class="pricing-desc">40 active suppliers • 1 top quote follow up calls ready.</p>
+                        
+                        <!-- Area Line Chart -->
+                        <div class="supplier-chart-container">
+                            <svg class="supplier-area-svg" viewBox="0 0 540 180" preserveAspectRatio="none">
+                                <defs>
+                                    <linearGradient id="suppAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.38"/>
+                                        <stop offset="60%" stop-color="#3b82f6" stop-opacity="0.12"/>
+                                        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.01"/>
+                                    </linearGradient>
+                                    <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.12"/>
+                                    </filter>
+                                </defs>
+                                
+                                <!-- Horizontal Grid lines -->
+                                <line x1="45" y1="22" x2="520" y2="22" stroke="#f1f5f9" stroke-width="1.2" stroke-dasharray="4,4"/>
+                                <line x1="45" y1="52" x2="520" y2="52" stroke="#f1f5f9" stroke-width="1.2" stroke-dasharray="4,4"/>
+                                <line x1="45" y1="82" x2="520" y2="82" stroke="#f1f5f9" stroke-width="1.2" stroke-dasharray="4,4"/>
+                                <line x1="45" y1="112" x2="520" y2="112" stroke="#f1f5f9" stroke-width="1.2" stroke-dasharray="4,4"/>
+                                <line x1="45" y1="142" x2="520" y2="142" stroke="#e2e8f0" stroke-width="1.5"/>
+
+                                <!-- Left Y-axis text -->
+                                <text x="35" y="26" text-anchor="end" font-size="11" font-weight="700" fill="#64748b">100</text>
+                                <text x="35" y="56" text-anchor="end" font-size="11" font-weight="700" fill="#64748b">75</text>
+                                <text x="35" y="86" text-anchor="end" font-size="11" font-weight="700" fill="#64748b">50</text>
+                                <text x="35" y="116" text-anchor="end" font-size="11" font-weight="700" fill="#64748b">25</text>
+                                <text x="35" y="146" text-anchor="end" font-size="11" font-weight="700" fill="#64748b">0</text>
+
+                                <!-- Area Fill under Spline -->
+                                <path class="supplier-area-fill" d="M 60,108 C 115,108 125,68 175,68 C 225,68 245,44 290,44 C 335,44 360,39 400,39 C 445,39 470,32 505,32 L 505,142 L 60,142 Z" fill="url(#suppAreaGrad)"/>
+                                
+                                <!-- Spline Curve Line -->
+                                <path class="supplier-curve-line" d="M 60,108 C 115,108 125,68 175,68 C 225,68 245,44 290,44 C 335,44 360,39 400,39 C 445,39 470,32 505,32" fill="none" stroke="#2563eb" stroke-width="3.5" stroke-linecap="round"/>
+
+                                <!-- Glowing Node Dots -->
+                                <!-- Jul: 28% -->
+                                <circle cx="60" cy="108" r="6" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+                                <circle cx="60" cy="108" r="3" fill="#2563eb"/>
+                                <!-- Aug: 62% -->
+                                <circle cx="175" cy="68" r="6" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+                                <circle cx="175" cy="68" r="3" fill="#2563eb"/>
+                                <!-- Sep: 82% -->
+                                <circle cx="290" cy="44" r="6" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+                                <circle cx="290" cy="44" r="3" fill="#2563eb"/>
+                                <!-- Oct: 86% -->
+                                <circle cx="400" cy="39" r="6" fill="#ffffff" stroke="#2563eb" stroke-width="2.5"/>
+                                <circle cx="400" cy="39" r="3" fill="#2563eb"/>
+                                <!-- Nov: 92% -->
+                                <circle class="supplier-node-dot" cx="505" cy="32" r="7" fill="#ffffff" stroke="#2563eb" stroke-width="3"/>
+                                <circle cx="505" cy="32" r="3.5" fill="#2563eb"/>
+
+                                <!-- Prominent 92% Callout Tag -->
+                                <g transform="translate(505, 12)">
+                                    <rect x="-24" y="-18" width="48" height="22" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" filter="url(#badgeShadow)"/>
+                                    <text x="0" y="-3" text-anchor="middle" font-size="12" font-weight="900" fill="#0f172a">92%</text>
+                                </g>
+
+                                <!-- Bottom X-axis labels -->
+                                <text x="60" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">Jul</text>
+                                <text x="175" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">Aug</text>
+                                <text x="290" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">Sep</text>
+                                <text x="400" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">Oct</text>
+                                <text x="505" y="165" text-anchor="middle" font-size="12" font-weight="700" fill="#64748b">Nov</text>
+                            </svg>
+                        </div>
+
+                        <!-- Bottom Summary Row -->
                         <div class="pricing-bottom">
                             <div class="pricing-number-wrap">
                                 <span class="pricing-main-amt">₹2.69Cr</span>
-                                <span class="pricing-upside">(94.2% OTD)</span>
+                                <span class="pricing-upside">(94.2% QTD)</span>
                             </div>
                             <button class="btn-view-agent" onclick="openAgentDetail('supplier')">
-                                View Agent
+                                <span>View Agent</span>
+                                <span>→</span>
                             </button>
                         </div>
                     </div>
@@ -2907,6 +3248,10 @@
             } else if (viewName === 'agent-detail') {
                 const agentsBtn = document.getElementById('nav-agents');
                 if (agentsBtn) agentsBtn.classList.add('active');
+            }
+
+            if (viewName === 'dashboard') {
+                initAnimations();
             }
         }
 
