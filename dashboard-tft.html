@@ -1306,7 +1306,11 @@
             overflow: visible;
         }
 
-
+        /* ElevenLabs widget positioning on the left side of the dashboard */
+        elevenlabs-convai {
+            left: clamp(96px, 16vw, 236px) !important;
+            right: 0 !important;
+        }
 
         @media (max-height: 400px) {
             .view-panel#view-agent-detail {
@@ -1920,11 +1924,11 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        /* Big Round Mic Button (min 64px, Push-to-Talk) - Offset so ElevenLabs widget sits cleanly at bottom-right */
+        /* Big Round Mic Button (min 64px, Push-to-Talk) */
         .home-mic-btn {
             position: fixed;
             bottom: clamp(10px, 2.2vh, 22px);
-            right: clamp(90px, 11vw, 110px);
+            right: clamp(14px, 2.5vw, 28px);
             width: clamp(64px, 7.5vw, 76px);
             height: clamp(64px, 7.5vw, 76px);
             min-width: 64px;
@@ -4434,8 +4438,8 @@
         <span id="ledger-toast-text">Saved: Sharma +2,000</span>
     </div>
 
-    <!-- ElevenLabs Conversational Voice Agent Widget (Official Embed) -->
-    <elevenlabs-convai agent-id="agent_7301m7yskfjberetytdk0ds7gdag"></elevenlabs-convai>
+    <!-- ElevenLabs Conversational Voice Agent Widget (Official Embed - Left Side Placement) -->
+    <elevenlabs-convai agent-id="agent_7301m7yskfjberetytdk0ds7gdag" placement="bottom-left"></elevenlabs-convai>
     <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 </body>
 </html>
