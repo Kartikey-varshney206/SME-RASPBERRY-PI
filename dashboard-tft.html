@@ -302,7 +302,204 @@
            VIEW 1: DASHBOARD HOME
            ===================================================================== */
         #view-dashboard {
-            gap: clamp(6px, 1.2vh, 16px);
+            gap: clamp(8px, 1.4vh, 16px);
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            padding-bottom: clamp(90px, 14vh, 130px) !important;
+            scroll-behavior: smooth;
+        }
+        #view-dashboard::-webkit-scrollbar {
+            width: 6px;
+        }
+        #view-dashboard::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 6px;
+        }
+
+        /* =====================================================================
+           HOME PAGE LEDGER & BOOKKEEPING PANEL
+           ===================================================================== */
+        .home-ledger-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: clamp(10px, 1.6vh, 18px) clamp(12px, 1.6vw, 22px);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+            flex-shrink: 0;
+            width: 100%;
+        }
+        .ledger-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .ledger-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ledger-book-icon {
+            font-size: clamp(20px, 2.2vw, 28px);
+        }
+        .ledger-sub-text {
+            font-size: clamp(9.5px, 0.85vw, 12px);
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .btn-undo-entry {
+            min-height: 44px;
+            padding: 8px 18px;
+            background: #ffffff;
+            color: #dc2626;
+            border: 2px solid #fca5a5;
+            border-radius: 10px;
+            font-size: clamp(11px, 0.9vw, 13.5px);
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(220, 38, 38, 0.1);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-undo-entry:hover {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+        .btn-undo-entry:active {
+            transform: scale(0.96);
+            background: #fee2e2;
+        }
+        .btn-undo-entry:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .ledger-entries-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+        .ledger-entry-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: clamp(6px, 1vh, 10px) clamp(8px, 1vw, 14px);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: clamp(10.5px, 0.9vw, 13px);
+            gap: 10px;
+            transition: background 0.15s ease;
+        }
+        .ledger-entry-row:hover {
+            background: #f1f5f9;
+        }
+        .ledger-entry-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+        .ledger-entry-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .ledger-entry-customer {
+            font-weight: 800;
+            color: var(--text-dark);
+            white-space: nowrap;
+        }
+        .ledger-entry-note {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .ledger-entry-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .ledger-entry-badge {
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: clamp(10px, 0.85vw, 12.5px);
+            letter-spacing: -0.2px;
+        }
+        .badge-credit {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+        }
+        .badge-payment {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+        .badge-missed {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+        .ledger-entry-date {
+            font-size: clamp(9px, 0.75vw, 11px);
+            color: #94a3b8;
+            white-space: nowrap;
+        }
+        .ledger-empty-state {
+            padding: 14px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        /* Toast Notification */
+        .ledger-toast {
+            position: fixed;
+            top: clamp(16px, 3vh, 32px);
+            right: clamp(16px, 3vw, 32px);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: clamp(12px, 0.95vw, 14px);
+            font-weight: 700;
+            z-index: 99999;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            pointer-events: none;
+        }
+        .ledger-toast.success {
+            background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            border-color: #34d399;
+        }
+        .ledger-toast.error {
+            background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%);
+            border-color: #f87171;
+        }
+        .ledger-toast.show {
+            display: flex;
+            animation: toastPop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes toastPop {
+            from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         /* ROW 1: 3 KPI Cards */
@@ -2057,7 +2254,7 @@
                             </div>
                             <span class="mini-title">Collections</span>
                         </div>
-                        <div class="mini-val">₹4.33Cr</div>
+                        <div class="mini-val" id="kpi-collections-val">₹4.33Cr</div>
                         <span class="pill-badge badge-active">Active</span>
                     </div>
 
@@ -2093,6 +2290,30 @@
                         </div>
                         <div class="mini-val" style="font-size:clamp(12px, 1.25vw, 17px); color:#4c1d95;">Kavya Voice</div>
                         <span class="pill-badge" style="background:#7c3aed; color:#ffffff; font-weight:700;">ElevenLabs 🎙️</span>
+                    </div>
+                </div>
+
+                <!-- =======================================================
+                     RECENT LEDGER ENTRIES PANEL (VOICE BOOKKEEPING)
+                     ======================================================= -->
+                <div class="panel-card home-ledger-panel" id="home-ledger-panel">
+                    <div class="ledger-panel-header">
+                        <div class="ledger-header-left">
+                            <span class="ledger-book-icon">📒</span>
+                            <div>
+                                <span class="panel-title">Recent Voice Bookkeeping Entries</span>
+                                <span class="ledger-sub-text">Synced live with <code>data/ledger.xlsx</code> • ElevenLabs AI Enabled</span>
+                            </div>
+                        </div>
+                        <button class="btn-undo-entry" id="btn-undo-ledger" onclick="undoLastLedgerEntry(event)" title="Undo last transaction">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
+                            <span>UNDO LAST ENTRY</span>
+                        </button>
+                    </div>
+
+                    <!-- 5 Recent Entries List -->
+                    <div class="ledger-entries-list" id="ledger-recent-list">
+                        <div class="ledger-empty-state">Loading recent entries...</div>
                     </div>
                 </div>
 
@@ -4000,6 +4221,12 @@
                     if (e.target === homeElModal) closeHomeElevenLabsModal();
                 });
             }
+
+            // ElevenLabs Client Tools & Bookkeeping Init
+            attachElevenLabsClientTools();
+            loadRecentLedgerEntries();
+            refreshDashboardSummary();
+
             if (window.location.hash === '#advisor' || window.location.search.includes('agent=advisor')) {
                 openAgentDetail('advisor');
             } else if (window.location.hash === '#supplier' || window.location.search.includes('agent=supplier')) {
@@ -4008,6 +4235,208 @@
                 openAgentDetail('collections');
             }
         });
+
+        // =====================================================================
+        // ELEVENLABS CLIENT TOOL & VOICE BOOKKEEPING (EXCEL LEDGER)
+        // =====================================================================
+        let ledgerToastTimer = null;
+        function showLedgerToast(message, isSuccess = true) {
+            const toast = document.getElementById('ledger-toast');
+            const toastText = document.getElementById('ledger-toast-text');
+            const toastIcon = document.getElementById('ledger-toast-icon');
+            if (!toast || !toastText) return;
+
+            if (ledgerToastTimer) clearTimeout(ledgerToastTimer);
+            toastText.textContent = message;
+            if (toastIcon) toastIcon.textContent = isSuccess ? '✅' : '⚠️';
+            toast.className = `ledger-toast ${isSuccess ? 'success' : 'error'} show`;
+
+            ledgerToastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4500);
+        }
+
+        async function refreshDashboardSummary() {
+            try {
+                const res = await fetch('/api/summary');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.ok && typeof data.total_pending === 'number') {
+                    const formatted = '₹' + formatINR(data.total_pending);
+                    const recEl = document.getElementById('kpi-rec-val');
+                    if (recEl) {
+                        recEl.textContent = formatted;
+                        recEl.style.color = '#2563eb';
+                        setTimeout(() => { recEl.style.color = ''; }, 1000);
+                    }
+                    const collEl = document.getElementById('kpi-collections-val');
+                    if (collEl) {
+                        collEl.textContent = formatted;
+                    }
+                }
+            } catch (err) {
+                console.warn('Failed to refresh dashboard summary:', err);
+            }
+        }
+
+        async function loadRecentLedgerEntries() {
+            const listEl = document.getElementById('ledger-recent-list');
+            if (!listEl) return;
+
+            try {
+                const res = await fetch('/api/ledger/recent');
+                if (!res.ok) throw new Error('Failed to fetch recent entries');
+                const data = await res.json();
+
+                if (data.ok && Array.isArray(data.entries) && data.entries.length > 0) {
+                    listEl.innerHTML = '';
+                    data.entries.forEach(entry => {
+                        const row = document.createElement('div');
+                        row.className = 'ledger-entry-row';
+
+                        let badgeClass = 'badge-credit';
+                        let sign = '+';
+                        let typeLabel = 'Credit Given';
+                        if (entry.type === 'payment_received') {
+                            badgeClass = 'badge-payment';
+                            sign = '-';
+                            typeLabel = 'Payment Received';
+                        } else if (entry.type === 'payment_missed') {
+                            badgeClass = 'badge-missed';
+                            sign = '⚠️ ';
+                            typeLabel = 'Payment Missed';
+                        }
+
+                        const dateStr = entry.date ? entry.date.substring(5, 16) : '';
+                        const amtFormatted = '₹' + (Number(entry.amount) || 0).toLocaleString('en-IN');
+
+                        row.innerHTML = `
+                            <div class="ledger-entry-left">
+                                <span class="ledger-entry-icon">${entry.type === 'credit_given' ? '📤' : (entry.type === 'payment_received' ? '📥' : '⚠️')}</span>
+                                <div style="min-width: 0;">
+                                    <span class="ledger-entry-customer">${escapeHtml(entry.customer)}</span>
+                                    ${entry.note ? `<span class="ledger-entry-note"> • ${escapeHtml(entry.note)}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="ledger-entry-right">
+                                <span class="ledger-entry-badge ${badgeClass}" title="${typeLabel}">${sign}${amtFormatted}</span>
+                                <span class="ledger-entry-date">${dateStr}</span>
+                            </div>
+                        `;
+                        listEl.appendChild(row);
+                    });
+                } else {
+                    listEl.innerHTML = '<div class="ledger-empty-state">No entries yet. Speak a transaction to ElevenLabs to record.</div>';
+                }
+            } catch (err) {
+                console.warn('Failed to load recent entries:', err);
+                listEl.innerHTML = '<div class="ledger-empty-state">Unable to load recent entries.</div>';
+            }
+        }
+
+        async function undoLastLedgerEntry(e) {
+            if (e) {
+                try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
+            }
+            const btn = document.getElementById('btn-undo-ledger');
+            if (btn) btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/ledger/undo', { method: 'POST' });
+                const data = await res.json();
+
+                if (res.ok && data.ok) {
+                    const entry = data.undone_entry || {};
+                    const amt = Number(entry.amount) || 0;
+                    showLedgerToast(`Undone: ${entry.customer} ₹${amt.toLocaleString('en-IN')}`, true);
+                    refreshDashboardSummary();
+                    loadRecentLedgerEntries();
+                } else {
+                    showLedgerToast(data.error || 'Failed to undo entry', false);
+                }
+            } catch (err) {
+                showLedgerToast(`Error: ${err.message}`, false);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // Attach Client Tool: record_transaction to ElevenLabs widget
+        function attachElevenLabsClientTools() {
+            const widgets = document.querySelectorAll("elevenlabs-convai");
+            widgets.forEach(widget => {
+                if (widget._hasClientToolsAttached) return;
+                widget._hasClientToolsAttached = true;
+
+                widget.addEventListener("elevenlabs-convai:call", (event) => {
+                    console.log("[ElevenLabs ConvAI Call Event]", event);
+                    if (!event.detail || !event.detail.config) return;
+
+                    event.detail.config.clientTools = event.detail.config.clientTools || {};
+
+                    // Client Tool Name must be exactly record_transaction (case-sensitive)
+                    event.detail.config.clientTools.record_transaction = async ({ customer_name, type, amount, date, note }) => {
+                        console.log("[Client Tool: record_transaction triggered by ElevenLabs]", { customer_name, type, amount, date, note });
+                        try {
+                            const res = await fetch('/api/ledger', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    customer_name: customer_name,
+                                    type: type,
+                                    amount: Number(amount),
+                                    date: date,
+                                    note: note
+                                })
+                            });
+                            const data = await res.json();
+
+                            if (res.ok && data.ok) {
+                                const numAmt = Number(amount) || 0;
+                                const sign = (type === 'credit_given') ? '+' : (type === 'payment_received' ? '-' : '•');
+                                const toastMsg = `Saved: ${data.customer} ${sign}₹${numAmt.toLocaleString('en-IN')}`;
+                                showLedgerToast(toastMsg, true);
+
+                                // Refresh dashboard cards without reload
+                                refreshDashboardSummary();
+                                loadRecentLedgerEntries();
+
+                                const resultPayload = {
+                                    ok: true,
+                                    customer: data.customer,
+                                    new_balance: data.new_balance,
+                                    message: `Recorded ${type.replace(/_/g, ' ')} of ₹${numAmt} for ${data.customer}. New balance is ₹${data.new_balance}.`
+                                };
+                                return JSON.stringify(resultPayload);
+                            } else {
+                                const errMsg = data.error || 'Failed to record transaction';
+                                showLedgerToast(`Failed: ${errMsg}`, false);
+                                return JSON.stringify({
+                                    ok: false,
+                                    error: errMsg,
+                                    options: data.options || []
+                                });
+                            }
+                        } catch (netErr) {
+                            console.error('[record_transaction Net Error]', netErr);
+                            showLedgerToast(`Failed: ${netErr.message}`, false);
+                            return JSON.stringify({ ok: false, error: netErr.message });
+                        }
+                    };
+                });
+            });
+        }
     </script>
+
+    <!-- Bookkeeping Toast Notification -->
+    <div id="ledger-toast" class="ledger-toast">
+        <span id="ledger-toast-icon">✅</span>
+        <span id="ledger-toast-text">Saved: Sharma +2,000</span>
+    </div>
 </body>
 </html>

@@ -8,6 +8,7 @@ const { spawnSync } = require('child_process');
 const multer = require('multer');
 const axios = require('axios');
 const ffmpegPath = require('ffmpeg-static') || 'ffmpeg';
+const ExcelJS = require('exceljs');
 
 // Load environment configuration
 dotenv.config();
@@ -656,6 +657,353 @@ app.get('/api/logs', (req, res) => {
         res.type('text/plain').send(logs);
     } catch (err) {
         res.status(500).send('Error reading logs.');
+    }
+});
+
+// =============================================================================
+// BOOKKEEPING & LEDGER EXCEL API (data/ledger.xlsx)
+// =============================================================================
+const DATA_DIR = path.join(__dirname, 'data');
+const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
+const LEDGER_PATH = path.join(DATA_DIR, 'ledger.xlsx');
+const LEDGER_LOG_PATH = path.join(__dirname, 'ledger.log');
+
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+if (!fs.existsSync(BACKUPS_DIR)) fs.mkdirSync(BACKUPS_DIR, { recursive: true });
+
+function logLedger(entry) {
+    const timestamp = new Date().toISOString();
+    try {
+        fs.appendFileSync(LEDGER_LOG_PATH, `[${timestamp}] ${entry}\n`, 'utf8');
+    } catch (err) {
+        console.error('Error writing to ledger.log:', err.message);
+    }
+}
+
+function makeLedgerBackup() {
+    try {
+        if (fs.existsSync(LEDGER_PATH)) {
+            const backupFile = path.join(BACKUPS_DIR, `ledger_backup_${Date.now()}.xlsx`);
+            fs.copyFileSync(LEDGER_PATH, backupFile);
+        }
+    } catch (err) {
+        console.error('Failed to create ledger backup:', err.message);
+    }
+}
+
+async function ensureLedgerWorkbook() {
+    if (fs.existsSync(LEDGER_PATH)) return;
+    const wb = new ExcelJS.Workbook();
+    const custSheet = wb.addWorksheet('Customers');
+    custSheet.columns = [
+        { header: 'Name', key: 'name', width: 25 },
+        { header: 'Phone', key: 'phone', width: 20 },
+        { header: 'Balance', key: 'balance', width: 15 }
+    ];
+    custSheet.addRow({ name: 'Sharma', phone: '+919876543210', balance: 15000 });
+    custSheet.addRow({ name: 'Anuj', phone: '+919876543211', balance: 8000 });
+    custSheet.addRow({ name: 'Aman', phone: '+919876543212', balance: 22000 });
+
+    const ledgerSheet = wb.addWorksheet('Ledger');
+    ledgerSheet.columns = [
+        { header: 'Date', key: 'date', width: 22 },
+        { header: 'Customer', key: 'customer', width: 25 },
+        { header: 'Type', key: 'type', width: 20 },
+        { header: 'Amount', key: 'amount', width: 15 },
+        { header: 'Note', key: 'note', width: 30 },
+        { header: 'Source', key: 'source', width: 15 }
+    ];
+    ledgerSheet.addRow({ date: '2026-11-20 10:00:00', customer: 'Sharma', type: 'credit_given', amount: 15000, note: 'Opening balance', source: 'system' });
+    ledgerSheet.addRow({ date: '2026-11-20 10:30:00', customer: 'Anuj', type: 'credit_given', amount: 8000, note: 'Opening balance', source: 'system' });
+    ledgerSheet.addRow({ date: '2026-11-20 11:00:00', customer: 'Aman', type: 'credit_given', amount: 22000, note: 'Opening balance', source: 'system' });
+
+    await wb.xlsx.writeFile(LEDGER_PATH);
+    logLedger('INITIALIZE: Created data/ledger.xlsx with sample customers.');
+}
+ensureLedgerWorkbook().catch(err => console.error('Error ensuring ledger workbook:', err));
+
+// Promise queue ensuring sequential non-conflicting saves
+let ledgerQueue = Promise.resolve();
+function runInLedgerQueue(task) {
+    return new Promise((resolve, reject) => {
+        ledgerQueue = ledgerQueue.then(async () => {
+            try {
+                const res = await task();
+                resolve(res);
+            } catch (err) {
+                reject(err);
+            }
+        }).catch(err => {
+            console.error('[Ledger Queue Exception]', err);
+            reject(err);
+        });
+    });
+}
+
+// 1. POST /api/ledger { customer_name, type, amount, date?, note? }
+app.post('/api/ledger', async (req, res) => {
+    try {
+        const { customer_name, type, amount, date, note } = req.body || {};
+
+        if (!customer_name || typeof customer_name !== 'string' || !customer_name.trim()) {
+            logLedger(`POST /api/ledger - REJECTED: Missing customer_name`);
+            return res.status(400).json({ ok: false, error: 'Customer name is required.' });
+        }
+
+        const validTypes = ['credit_given', 'payment_received', 'payment_missed'];
+        if (!type || !validTypes.includes(type)) {
+            logLedger(`POST /api/ledger - REJECTED: Invalid transaction type "${type}"`);
+            return res.status(400).json({
+                ok: false,
+                error: `Invalid transaction type "${type}". Allowed types: credit_given, payment_received, payment_missed.`
+            });
+        }
+
+        const parsedAmount = Number(amount);
+        if (isNaN(parsedAmount) || parsedAmount <= 0) {
+            logLedger(`POST /api/ledger - REJECTED: Invalid amount "${amount}"`);
+            return res.status(400).json({ ok: false, error: 'Amount must be a positive number greater than zero.' });
+        }
+
+        const cleanSearch = customer_name.trim().toLowerCase();
+
+        const result = await runInLedgerQueue(async () => {
+            await ensureLedgerWorkbook();
+            const wb = new ExcelJS.Workbook();
+            await wb.xlsx.readFile(LEDGER_PATH);
+            const custSheet = wb.getWorksheet('Customers') || wb.worksheets[0];
+            const ledgerSheet = wb.getWorksheet('Ledger') || wb.worksheets[1];
+
+            // Customer Matching in Customers sheet
+            let matchedRow = null;
+            const matches = [];
+
+            for (let i = 2; i <= custSheet.rowCount; i++) {
+                const row = custSheet.getRow(i);
+                const name = String(row.getCell(1).value || '').trim();
+                if (!name) continue;
+                const nameLower = name.toLowerCase();
+
+                if (nameLower === cleanSearch) {
+                    matchedRow = row;
+                    matches.push({ name, row });
+                    break;
+                } else if (nameLower.includes(cleanSearch) || cleanSearch.includes(nameLower)) {
+                    matches.push({ name, row });
+                }
+            }
+
+            if (!matchedRow) {
+                if (matches.length === 1) {
+                    matchedRow = matches[0].row;
+                } else if (matches.length > 1) {
+                    logLedger(`POST /api/ledger - MULTIPLE MATCHES for "${customer_name}": ${matches.map(m => m.name).join(', ')}`);
+                    return {
+                        ok: false,
+                        error: 'Multiple matches',
+                        options: matches.map(m => m.name)
+                    };
+                }
+            }
+
+            let customerFinalName = '';
+            let newBalance = 0;
+            let warning = undefined;
+
+            if (!matchedRow) {
+                if (type === 'credit_given') {
+                    customerFinalName = customer_name.trim();
+                    newBalance = parsedAmount;
+                    custSheet.addRow([customerFinalName, '', newBalance]);
+                    logLedger(`POST /api/ledger - Auto-created customer "${customerFinalName}" with initial credit balance ₹${newBalance}`);
+                } else {
+                    logLedger(`POST /api/ledger - REJECTED: Customer not found "${customer_name}" for ${type}`);
+                    return {
+                        ok: false,
+                        error: `Customer not found: "${customer_name}". Please verify customer name.`
+                    };
+                }
+            } else {
+                customerFinalName = String(matchedRow.getCell(1).value || '').trim();
+                const currentBalance = Number(matchedRow.getCell(3).value) || 0;
+
+                if (type === 'credit_given') {
+                    newBalance = currentBalance + parsedAmount;
+                    matchedRow.getCell(3).value = newBalance;
+                } else if (type === 'payment_received') {
+                    if (parsedAmount > currentBalance) {
+                        warning = `Payment amount (₹${parsedAmount}) exceeds outstanding balance (₹${currentBalance}).`;
+                    }
+                    newBalance = Math.max(0, currentBalance - parsedAmount);
+                    matchedRow.getCell(3).value = newBalance;
+                } else if (type === 'payment_missed') {
+                    newBalance = currentBalance;
+                }
+            }
+
+            // Append Ledger row (Source = "voice")
+            const entryDate = (date && String(date).trim()) || new Date().toISOString().replace('T', ' ').substring(0, 19);
+            const entryNote = (note && String(note).trim()) || (type === 'payment_missed' ? 'Payment missed / promised date past' : '');
+            ledgerSheet.addRow([entryDate, customerFinalName, type, parsedAmount, entryNote, 'voice']);
+
+            makeLedgerBackup();
+            await wb.xlsx.writeFile(LEDGER_PATH);
+
+            logLedger(`POST /api/ledger - SUCCESS: ${type} of ₹${parsedAmount} for ${customerFinalName}. New Balance: ₹${newBalance}`);
+
+            return {
+                ok: true,
+                customer: customerFinalName,
+                type: type,
+                amount: parsedAmount,
+                new_balance: newBalance,
+                warning: warning
+            };
+        });
+
+        if (!result.ok) {
+            return res.status(result.error === 'Multiple matches' ? 409 : 404).json(result);
+        }
+
+        return res.json(result);
+    } catch (err) {
+        logLedger(`POST /api/ledger - ERROR: ${err.message}`);
+        console.error('[Ledger Route Error]', err);
+        return res.status(500).json({ ok: false, error: 'Internal ledger error: ' + err.message });
+    }
+});
+
+// 2. POST /api/ledger/undo (Reverse last Ledger row and update balance)
+app.post('/api/ledger/undo', async (req, res) => {
+    try {
+        const result = await runInLedgerQueue(async () => {
+            await ensureLedgerWorkbook();
+            const wb = new ExcelJS.Workbook();
+            await wb.xlsx.readFile(LEDGER_PATH);
+            const custSheet = wb.getWorksheet('Customers') || wb.worksheets[0];
+            const ledgerSheet = wb.getWorksheet('Ledger') || wb.worksheets[1];
+
+            let lastRowIdx = ledgerSheet.rowCount;
+            while (lastRowIdx > 1) {
+                const row = ledgerSheet.getRow(lastRowIdx);
+                if (row.getCell(2).value) break;
+                lastRowIdx--;
+            }
+
+            if (lastRowIdx <= 1) {
+                return { ok: false, error: 'No transactions found in ledger to undo.' };
+            }
+
+            const lastRow = ledgerSheet.getRow(lastRowIdx);
+            const rowDate = String(lastRow.getCell(1).value || '');
+            const rowCustomer = String(lastRow.getCell(2).value || '').trim();
+            const rowType = String(lastRow.getCell(3).value || '').trim();
+            const rowAmount = Number(lastRow.getCell(4).value) || 0;
+            const rowNote = String(lastRow.getCell(5).value || '');
+
+            let updatedBalance = null;
+
+            for (let i = 2; i <= custSheet.rowCount; i++) {
+                const cRow = custSheet.getRow(i);
+                const cName = String(cRow.getCell(1).value || '').trim();
+                if (cName.toLowerCase() === rowCustomer.toLowerCase()) {
+                    let bal = Number(cRow.getCell(3).value) || 0;
+                    if (rowType === 'credit_given') {
+                        bal = Math.max(0, bal - rowAmount);
+                    } else if (rowType === 'payment_received') {
+                        bal = bal + rowAmount;
+                    }
+                    cRow.getCell(3).value = bal;
+                    updatedBalance = bal;
+                    break;
+                }
+            }
+
+            ledgerSheet.spliceRows(lastRowIdx, 1);
+
+            makeLedgerBackup();
+            await wb.xlsx.writeFile(LEDGER_PATH);
+            logLedger(`POST /api/ledger/undo - SUCCESS: Reverted ${rowType} of ₹${rowAmount} for ${rowCustomer}.`);
+
+            return {
+                ok: true,
+                undone_entry: {
+                    date: rowDate,
+                    customer: rowCustomer,
+                    type: rowType,
+                    amount: rowAmount,
+                    note: rowNote
+                },
+                new_balance: updatedBalance
+            };
+        });
+
+        if (!result.ok) {
+            return res.status(400).json(result);
+        }
+        return res.json(result);
+    } catch (err) {
+        logLedger(`POST /api/ledger/undo - ERROR: ${err.message}`);
+        console.error('[Ledger Undo Error]', err);
+        return res.status(500).json({ ok: false, error: 'Undo error: ' + err.message });
+    }
+});
+
+// 3. GET /api/ledger/recent (Last 5 entries from Ledger sheet)
+app.get('/api/ledger/recent', async (req, res) => {
+    try {
+        const result = await runInLedgerQueue(async () => {
+            await ensureLedgerWorkbook();
+            const wb = new ExcelJS.Workbook();
+            await wb.xlsx.readFile(LEDGER_PATH);
+            const ledgerSheet = wb.getWorksheet('Ledger') || wb.worksheets[1];
+
+            const entries = [];
+            for (let i = ledgerSheet.rowCount; i >= 2 && entries.length < 5; i--) {
+                const row = ledgerSheet.getRow(i);
+                const cust = row.getCell(2).value;
+                if (!cust) continue;
+                entries.push({
+                    date: String(row.getCell(1).value || ''),
+                    customer: String(cust || ''),
+                    type: String(row.getCell(3).value || ''),
+                    amount: Number(row.getCell(4).value) || 0,
+                    note: String(row.getCell(5).value || ''),
+                    source: String(row.getCell(6).value || 'voice')
+                });
+            }
+            return { ok: true, entries };
+        });
+        return res.json(result);
+    } catch (err) {
+        return res.status(500).json({ ok: false, error: err.message, entries: [] });
+    }
+});
+
+// 4. GET /api/summary (Total pending sum of balances for dashboard cards)
+app.get('/api/summary', async (req, res) => {
+    try {
+        const result = await runInLedgerQueue(async () => {
+            await ensureLedgerWorkbook();
+            const wb = new ExcelJS.Workbook();
+            await wb.xlsx.readFile(LEDGER_PATH);
+            const custSheet = wb.getWorksheet('Customers') || wb.worksheets[0];
+
+            let totalPending = 0;
+            let customerCount = 0;
+            for (let i = 2; i <= custSheet.rowCount; i++) {
+                const row = custSheet.getRow(i);
+                const name = row.getCell(1).value;
+                if (!name) continue;
+                const bal = Number(row.getCell(3).value) || 0;
+                totalPending += bal;
+                customerCount++;
+            }
+            return { ok: true, total_pending: totalPending, customer_count: customerCount };
+        });
+        return res.json(result);
+    } catch (err) {
+        return res.status(500).json({ ok: false, error: err.message });
     }
 });
 
