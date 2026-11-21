@@ -553,13 +553,22 @@
             background: #1d4ed8;
         }
 
-        /* ROW 3: 3 Mini Cards */
+        /* ROW 3: 4 Mini Cards */
         .bottom-row {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr 1.15fr;
             gap: clamp(6px, 1vw, 16px);
             flex: 1;
             min-height: 0;
+        }
+        .mini-card-advisor {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%) !important;
+            border-color: #ddd6fe !important;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .mini-card-advisor:active {
+            transform: scale(0.96);
         }
         .mini-card {
             background: var(--card-bg);
@@ -1103,12 +1112,8 @@
             overflow: visible;
         }
 
-        /* ElevenLabs ConvAI widget: HIDDEN everywhere by default */
+        /* ElevenLabs ConvAI widget: active in AI Advisor and Home Modal */
         elevenlabs-convai {
-            display: none !important;
-        }
-        /* ElevenLabs ConvAI widget: SHOWN ONLY in AI Advisor */
-        body.in-ai-advisor elevenlabs-convai {
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
@@ -1446,6 +1451,181 @@
         .stt-mode-pill:active {
             transform: scale(0.95);
             background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* ElevenLabs Home Quick Pill */
+        .btn-home-kavya-pill {
+            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: clamp(8.5px, 0.75vw, 11px);
+            font-weight: 700;
+            padding: 2px 8px;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.35);
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+        .btn-home-kavya-pill:active {
+            transform: scale(0.95);
+        }
+
+        /* Floating ElevenLabs Voice FAB (next to mic button) */
+        .home-el-fab {
+            position: fixed;
+            bottom: clamp(10px, 2.2vh, 22px);
+            right: clamp(86px, 10.5vw, 114px);
+            width: clamp(52px, 6vw, 64px);
+            height: clamp(52px, 6vw, 64px);
+            min-width: 52px;
+            min-height: 52px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            outline: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 18px rgba(124, 58, 237, 0.45);
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .home-el-fab:active {
+            transform: scale(0.92);
+        }
+        .home-el-fab-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #10b981;
+            color: #ffffff;
+            font-size: 8px;
+            font-weight: 800;
+            border-radius: 6px;
+            padding: 1px 4px;
+            border: 1px solid #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        /* ElevenLabs Home Modal */
+        .home-el-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .home-el-modal-overlay.active {
+            display: flex;
+            animation: overlayFadeIn 0.2s ease forwards;
+        }
+        .home-el-modal-card {
+            background: #ffffff;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .home-el-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .home-el-modal-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #7c3aed;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+        }
+        .home-el-modal-title {
+            font-size: 14.5px;
+            font-weight: 800;
+            color: #1e1b4b;
+        }
+        .home-el-modal-sub {
+            font-size: 11px;
+            color: #6d28d9;
+            font-weight: 600;
+        }
+        .btn-close-el-modal {
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            line-height: 1;
+            color: #64748b;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 8px;
+        }
+        .btn-close-el-modal:hover {
+            color: #0f172a;
+            background: rgba(0,0,0,0.05);
+        }
+        .home-el-modal-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .home-el-hint {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+        .home-el-convai-box {
+            width: 100%;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .btn-el-modal-direct {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #4f46e5;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
         }
 
         /* Big Round Mic Button (min 64px, Push-to-Talk) */
@@ -1904,6 +2084,16 @@
                         <div class="mini-val">3</div>
                         <button class="btn-view-all" onclick="switchView('agents')">View All →</button>
                     </div>
+
+                    <!-- Mini Card 4: AI Voice Advisor (ElevenLabs) -->
+                    <div class="mini-card mini-card-advisor" onclick="openHomeElevenLabsModal(event)" style="cursor: pointer; background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border-color: #ddd6fe; transition: transform 0.15s ease;" title="Click to talk with Kavya (ElevenLabs Voice)">
+                        <div class="mini-top">
+                            <div class="mini-icon-box" style="background:#7c3aed; color:#ffffff;">🧠</div>
+                            <span class="mini-title" style="color:#5b21b6; font-weight:700;">AI Advisor</span>
+                        </div>
+                        <div class="mini-val" style="font-size:clamp(12px, 1.25vw, 17px); color:#4c1d95;">Kavya Voice</div>
+                        <span class="pill-badge" style="background:#7c3aed; color:#ffffff; font-weight:700;">ElevenLabs 🎙️</span>
+                    </div>
                 </div>
 
                 <!-- =======================================================
@@ -1917,7 +2107,16 @@
                         <button id="stt-mode-toggle" class="stt-mode-pill" onclick="toggleSttMode(event)" title="Toggle STT Mode: Gnani Server or Browser">
                             <span id="stt-mode-label">Gnani STT ⚡</span>
                         </button>
+                        <button id="btn-home-talk-kavya" class="btn-home-kavya-pill" onclick="openHomeElevenLabsModal(event)" title="Talk to ElevenLabs Conversational Voice AI">
+                            <span>🧠 Talk to Kavya</span>
+                        </button>
                     </div>
+
+                    <!-- ElevenLabs Voice Agent Floating Button (Purple) -->
+                    <button id="home-elevenlabs-fab" class="home-el-fab" onclick="openHomeElevenLabsModal(event)" ontouchend="openHomeElevenLabsModal(event)" aria-label="ElevenLabs AI Advisor" title="Talk to Kavya (ElevenLabs Voice)">
+                        <span class="home-el-fab-badge">AI</span>
+                        <span style="font-size: 24px;">🧠</span>
+                    </button>
 
                     <!-- Big Round Mic Button (min 64px, Push-to-Talk) -->
                     <button id="home-voice-mic-btn" class="home-mic-btn idle" onclick="handleMicButtonClick(event)" ontouchend="handleMicButtonClick(event)" aria-label="Voice Command Microphone" title="Tap to start, speak, tap again to end">
@@ -1935,6 +2134,36 @@
                             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4"/>
                         </svg>
                     </button>
+
+                    <!-- ElevenLabs Conversational Voice Modal on Home Page -->
+                    <div id="home-el-modal" class="home-el-modal-overlay">
+                        <div class="home-el-modal-card">
+                            <div class="home-el-modal-header">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div class="home-el-modal-avatar">🧠</div>
+                                    <div>
+                                        <div class="home-el-modal-title">Kavya • AI Business Advisor</div>
+                                        <div class="home-el-modal-sub">ElevenLabs Conversational Voice AI</div>
+                                    </div>
+                                </div>
+                                <button class="btn-close-el-modal" onclick="closeHomeElevenLabsModal(event)" title="Close">&times;</button>
+                            </div>
+                            <div class="home-el-modal-body">
+                                <p class="home-el-hint">Tap the animated orb below to start real-time conversation:</p>
+                                <div class="home-el-convai-box">
+                                    <elevenlabs-convai agent-id="agent_1901m4kqdmycfkn9pra87mp8jmtd" id="home-modal-elevenlabs-widget"></elevenlabs-convai>
+                                </div>
+                                <div style="margin-top: 14px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                    <a href="https://elevenlabs.io/app/talk-to?agent_id=agent_1901m4kqdmycfkn9pra87mp8jmtd" target="_blank" class="btn-el-modal-direct">
+                                        <span>🎙️ Direct Audio Session ↗</span>
+                                    </a>
+                                    <button onclick="closeHomeElevenLabsModal(event)" style="background: #e2e8f0; color: #475569; border: none; padding: 8px 16px; border-radius: 9999px; font-size: 12px; font-weight: 700; cursor: pointer;">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Large Confirmation Card Modal -->
                     <div id="home-voice-confirm-modal" class="voice-confirm-overlay">
@@ -2559,6 +2788,86 @@
                 }
             }
             injectShadowStyles();
+        }
+
+        // =====================================================================
+        // HOME PAGE ELEVENLABS MODAL CONTROLS
+        // =====================================================================
+        function openHomeElevenLabsModal(e) {
+            if (e) {
+                try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
+            }
+            const modal = document.getElementById('home-el-modal');
+            if (modal) {
+                modal.classList.add('active');
+                setupHomeElevenLabsWidget();
+            }
+        }
+
+        function closeHomeElevenLabsModal(e) {
+            if (e) {
+                try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
+            }
+            const modal = document.getElementById('home-el-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        function setupHomeElevenLabsWidget() {
+            const el = document.getElementById('home-modal-elevenlabs-widget');
+            if (!el) return;
+
+            let attempts = 0;
+            function injectHomeStyles() {
+                attempts++;
+                if (!el.shadowRoot) {
+                    if (attempts < 30) setTimeout(injectHomeStyles, 150);
+                    return;
+                }
+
+                let style = el.shadowRoot.getElementById('home-custom-convai-override');
+                if (!style) {
+                    style = document.createElement('style');
+                    style.id = 'home-custom-convai-override';
+                    el.shadowRoot.appendChild(style);
+                }
+
+                style.textContent = `
+                    :host {
+                        position: relative !important;
+                        inset: auto !important;
+                        width: 100% !important;
+                        min-height: 200px !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        pointer-events: auto !important;
+                    }
+                    .overlay, [class*="overlay"] {
+                        position: relative !important;
+                        inset: auto !important;
+                        right: auto !important;
+                        bottom: auto !important;
+                        display: flex !important;
+                        flex-direction: column !important;
+                        align-items: center !important;
+                        justify-content: center !important;
+                        width: 100% !important;
+                        margin: 0 auto !important;
+                    }
+                    button, [role="button"] {
+                        cursor: pointer !important;
+                        pointer-events: auto !important;
+                    }
+                `;
+
+                if (attempts < 10) {
+                    setTimeout(injectHomeStyles, 300);
+                }
+            }
+            injectHomeStyles();
         }
 
         // Open Agent Detail View
@@ -3342,6 +3651,13 @@
                 };
             }
 
+            // 4. ElevenLabs AI Voice Advisor Matching (English + Hindi)
+            // e.g. "talk to advisor", "kavya", "elevenlabs", "advisor se baat karo", "ai advisor", "briefing"
+            const isAdvisor = /\b(advisor|kavya|elevenlabs|eleven\s*labs|briefing|consultant|ai\s*partner|talk\s*to\s*advisor)\b/i.test(text);
+            if (isAdvisor) {
+                return { action: 'talk_advisor', text: rawTranscript };
+            }
+
             return { action: 'unknown', text: rawTranscript };
         }
 
@@ -3358,6 +3674,12 @@
                     cancelVoiceCall();
                     return;
                 }
+            }
+
+            if (parsed.action === 'talk_advisor') {
+                openHomeElevenLabsModal();
+                speakVoiceFeedback("Opening AI Advisor Kavya.");
+                return;
             }
 
             if (parsed.action === 'call_supplier') {
@@ -3666,6 +3988,17 @@
             }
             if (typeof setupElevenLabsWidget === 'function') {
                 setupElevenLabsWidget();
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeHomeElevenLabsModal();
+                }
+            });
+            const homeElModal = document.getElementById('home-el-modal');
+            if (homeElModal) {
+                homeElModal.addEventListener('click', (e) => {
+                    if (e.target === homeElModal) closeHomeElevenLabsModal();
+                });
             }
             if (window.location.hash === '#advisor' || window.location.search.includes('agent=advisor')) {
                 openAgentDetail('advisor');
