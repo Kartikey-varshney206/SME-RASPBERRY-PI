@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SME Growth Advisor - TFT & Screen-Mirror Edition</title>
-    <!-- ElevenLabs Conversational AI Widget Script -->
-    <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
     <style>
         /* =====================================================================
            GLOBAL RESET & FULLSCREEN FLUID RESPONSIVENESS
@@ -1308,13 +1306,7 @@
             overflow: visible;
         }
 
-        /* ElevenLabs ConvAI widget */
-        elevenlabs-convai {
-            display: block;
-            width: 100%;
-            min-height: 200px;
-            pointer-events: auto !important;
-        }
+
 
         @media (max-height: 400px) {
             .view-panel#view-agent-detail {
@@ -1928,11 +1920,11 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
 
-        /* Big Round Mic Button (min 64px, Push-to-Talk) */
+        /* Big Round Mic Button (min 64px, Push-to-Talk) - Offset so ElevenLabs widget sits cleanly at bottom-right */
         .home-mic-btn {
             position: fixed;
             bottom: clamp(10px, 2.2vh, 22px);
-            right: clamp(12px, 2vw, 24px);
+            right: clamp(90px, 11vw, 110px);
             width: clamp(64px, 7.5vw, 76px);
             height: clamp(64px, 7.5vw, 76px);
             min-width: 64px;
@@ -2414,12 +2406,6 @@
                         </button>
                     </div>
 
-                    <!-- ElevenLabs Voice Agent Floating Button (Purple) -->
-                    <button id="home-elevenlabs-fab" class="home-el-fab" onclick="openHomeElevenLabsModal(event)" ontouchend="openHomeElevenLabsModal(event)" aria-label="ElevenLabs AI Advisor" title="Talk to Kavya (ElevenLabs Voice)">
-                        <span class="home-el-fab-badge">AI</span>
-                        <span style="font-size: 24px;">🧠</span>
-                    </button>
-
                     <!-- Big Round Mic Button (min 64px, Push-to-Talk) -->
                     <button id="home-voice-mic-btn" class="home-mic-btn idle" onclick="handleMicButtonClick(event)" ontouchend="handleMicButtonClick(event)" aria-label="Voice Command Microphone" title="Tap to start, speak, tap again to end">
                         <!-- SVG Mic Icon -->
@@ -2436,39 +2422,6 @@
                             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4"/>
                         </svg>
                     </button>
-
-                    <!-- ElevenLabs Conversational Voice Modal on Home Page -->
-                    <div id="home-el-modal" class="home-el-modal-overlay">
-                        <div class="home-el-modal-card">
-                            <div class="home-el-modal-header">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div class="home-el-modal-avatar">🧠</div>
-                                    <div>
-                                        <div class="home-el-modal-title">Kavya • AI Business Advisor</div>
-                                        <div class="home-el-modal-sub">ElevenLabs Conversational Voice AI</div>
-                                    </div>
-                                </div>
-                                <button class="btn-close-el-modal" onclick="closeHomeElevenLabsModal(event)" title="Close">&times;</button>
-                            </div>
-                            <div class="home-el-modal-body">
-                                <p style="font-size: 13px; color: #475569; margin-bottom: 12px; line-height: 1.4;">
-                                    Tap the <strong>animated orb</strong> below to speak with Kavya.<br>
-                                    <span style="font-size: 11px; color: #64748b;">(When prompted, click <strong>Allow</strong> for microphone access)</span>
-                                </p>
-                                <div class="home-el-convai-box">
-                                    <elevenlabs-convai agent-id="agent_1901m4kqdmycfkn9pra87mp8jmtd" id="home-modal-elevenlabs-widget"></elevenlabs-convai>
-                                </div>
-                                <div style="margin-top: 14px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                                    <a href="https://elevenlabs.io/app/talk-to?agent_id=agent_1901m4kqdmycfkn9pra87mp8jmtd" target="_blank" class="btn-el-modal-direct" title="Open official ElevenLabs conversation in new tab">
-                                        <span>🎙️ Direct Audio Session ↗</span>
-                                    </a>
-                                    <button onclick="closeHomeElevenLabsModal(event)" style="background: #e2e8f0; color: #475569; border: none; padding: 8px 16px; border-radius: 9999px; font-size: 12px; font-weight: 700; cursor: pointer;">
-                                        Close
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Large Confirmation Card Modal -->
                     <div id="home-voice-confirm-modal" class="voice-confirm-overlay">
@@ -3038,27 +2991,27 @@
         // ELEVENLABS CONVAI WIDGET CUSTOM STYLING (SHADOW DOM INJECTION)
         // =====================================================================
         // =====================================================================
-        // HOME PAGE ELEVENLABS MODAL CONTROLS
+        // ELEVENLABS VOICE AGENT WIDGET TRIGGER
         // =====================================================================
         function openHomeElevenLabsModal(e) {
             if (e) {
                 try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
             }
-            const modal = document.getElementById('home-el-modal');
-            if (modal) {
-                modal.classList.add('active');
+            const widget = document.querySelector('elevenlabs-convai');
+            if (!widget) {
+                console.warn('[ElevenLabs] widget element not found');
+                return;
             }
+            try {
+                if (widget.shadowRoot) {
+                    const btn = widget.shadowRoot.querySelector('button');
+                    if (btn) { btn.click(); return; }
+                }
+            } catch (err) {}
+            widget.click();
         }
 
-        function closeHomeElevenLabsModal(e) {
-            if (e) {
-                try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
-            }
-            const modal = document.getElementById('home-el-modal');
-            if (modal) {
-                modal.classList.remove('active');
-            }
-        }
+        function closeHomeElevenLabsModal(e) {}
 
         // Open Agent Detail View
         function openAgentDetail(agentKey) {
@@ -4245,21 +4198,10 @@
             if (typeof setupElevenLabsWidget === 'function') {
                 setupElevenLabsWidget();
             }
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    closeHomeElevenLabsModal();
-                }
-            });
-            const homeElModal = document.getElementById('home-el-modal');
-            if (homeElModal) {
-                homeElModal.addEventListener('click', (e) => {
-                    if (e.target === homeElModal) closeHomeElevenLabsModal();
-                });
-            }
 
             // ElevenLabs Client Tools & Bookkeeping Init
             attachElevenLabsClientTools();
-            loadRecentLedgerEntries();
+            // loadRecentLedgerEntries removed
             refreshDashboardSummary();
 
             if (window.location.hash === '#advisor' || window.location.search.includes('agent=advisor')) {
@@ -4385,7 +4327,7 @@
                     const amt = Number(entry.amount) || 0;
                     showLedgerToast(`Undone: ${entry.customer} ₹${amt.toLocaleString('en-IN')}`, true);
                     refreshDashboardSummary();
-                    loadRecentLedgerEntries();
+                    // loadRecentLedgerEntries removed
                 } else {
                     showLedgerToast(data.error || 'Failed to undo entry', false);
                 }
@@ -4485,5 +4427,9 @@
         <span id="ledger-toast-icon">✅</span>
         <span id="ledger-toast-text">Saved: Sharma +2,000</span>
     </div>
+
+    <!-- ElevenLabs Conversational Voice Agent Widget (Official Embed) -->
+    <elevenlabs-convai agent-id="agent_1901m4kqdmycfkn9pra87mp8jmtd"></elevenlabs-convai>
+    <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
 </body>
 </html>
