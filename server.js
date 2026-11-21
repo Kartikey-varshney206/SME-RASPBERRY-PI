@@ -13,12 +13,27 @@ const ExcelJS = require('exceljs');
 // Load environment configuration
 dotenv.config();
 
+// Global crash protection
+process.on('uncaughtException', (err) => {
+    console.error('[Server Uncaught Exception]', err.message, err.stack);
+});
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('[Server Unhandled Rejection]', reason);
+});
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+// Safe handling of malformed JSON from web clients/tunnels
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        return res.status(400).json({ success: false, error: 'Invalid JSON payload' });
+    }
+    next(err);
+});
 app.use(express.urlencoded({ extended: true }));
 
 // Multer memory storage for audio transcription uploads
