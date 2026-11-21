@@ -3137,11 +3137,11 @@
                     const data = await res.json();
                     if (Array.isArray(data) && data.length > 0) {
                         suppliersData = data.map(s => ({
-                            SupplierID: s.SupplierID,
-                            SupplierName: s.SupplierName,
-                            ContactPerson: s.ContactPerson,
-                            PrimaryCategory: s.PrimaryCategory,
-                            ReliabilityScore: s.ReliabilityScore
+                            SupplierID: s.SupplierID || s.id || "SUP001",
+                            SupplierName: s.SupplierName || s.name || s.supplier_name || "Supplier",
+                            ContactPerson: s.ContactPerson || s.contactPerson || s.contact || "Sales Team",
+                            PrimaryCategory: s.PrimaryCategory || s.category || s.primaryCategory || "General",
+                            ReliabilityScore: s.ReliabilityScore || s.reliabilityScore || 8
                         }));
                         if (!selectedSupplier) selectedSupplier = suppliersData[0];
                         renderSuppliersList();
@@ -3230,10 +3230,11 @@
                     const data = await res.json();
                     if (Array.isArray(data) && data.length > 0) {
                         pendingCustomersData = data.map(item => ({
-                            CustomerName: item.CustomerName || item.CustomerID || "Valued Customer",
-                            AmountPending: Number(item.AmountPending) || 0,
-                            DaysOverdue: Number(item.DaysOverdue) || 0,
-                            InvoiceID: item.InvoiceID || "INV000"
+                            CustomerID: item.CustomerID || item.id || "CUST000",
+                            CustomerName: item.CustomerName || item.name || item.customer_name || item.CustomerID || "Valued Customer",
+                            AmountPending: Number(item.AmountPending || item.amountPending || item.amount) || 0,
+                            DaysOverdue: Number(item.DaysOverdue || item.daysOverdue) || 0,
+                            InvoiceID: item.InvoiceID || item.invoiceId || "INV000"
                         }));
                         if (!selectedCustomer) selectedCustomer = pendingCustomersData[0];
                         renderPendingCustomersList();
