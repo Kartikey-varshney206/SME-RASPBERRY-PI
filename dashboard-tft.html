@@ -1308,16 +1308,11 @@
             overflow: visible;
         }
 
-        /* ElevenLabs ConvAI widget: active in AI Advisor and Home Modal */
+        /* ElevenLabs ConvAI widget */
         elevenlabs-convai {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            position: relative !important;
-            inset: auto !important;
-            width: 100% !important;
-            height: 100% !important;
+            display: block;
+            width: 100%;
+            min-height: 200px;
             pointer-events: auto !important;
         }
 
@@ -2456,28 +2451,14 @@
                                 <button class="btn-close-el-modal" onclick="closeHomeElevenLabsModal(event)" title="Close">&times;</button>
                             </div>
                             <div class="home-el-modal-body">
-                                <div id="el-mic-status-badge" class="el-mic-badge testing" onclick="checkAndRequestMicPermission()">
-                                    <span>🎙️</span>
-                                    <span>Click to test / enable microphone</span>
-                                </div>
-                                <div id="el-mic-status-tip" class="el-mic-tip">
-                                    Testing microphone access...
-                                </div>
-                                <div id="el-live-call-status" class="el-live-call-status idle">
-                                    <span>⚪</span> <strong>Status:</strong> Tap orb or Start Call to speak
-                                </div>
+                                <p style="font-size: 13px; color: #475569; margin-bottom: 12px; line-height: 1.4;">
+                                    Tap the <strong>animated orb</strong> below to speak with Kavya.<br>
+                                    <span style="font-size: 11px; color: #64748b;">(When prompted, click <strong>Allow</strong> for microphone access)</span>
+                                </p>
                                 <div class="home-el-convai-box">
                                     <elevenlabs-convai agent-id="agent_1901m4kqdmycfkn9pra87mp8jmtd" id="home-modal-elevenlabs-widget"></elevenlabs-convai>
                                 </div>
-                                <div class="el-call-controls">
-                                    <button class="btn-el-start-call" onclick="startElevenLabsConversation()">
-                                        <span>🟢 Start Voice Call</span>
-                                    </button>
-                                    <button class="btn-el-end-call" onclick="endElevenLabsConversation()">
-                                        <span>🔴 End Call</span>
-                                    </button>
-                                </div>
-                                <div style="margin-top: 10px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                <div style="margin-top: 14px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
                                     <a href="https://elevenlabs.io/app/talk-to?agent_id=agent_1901m4kqdmycfkn9pra87mp8jmtd" target="_blank" class="btn-el-modal-direct" title="Open official ElevenLabs conversation in new tab">
                                         <span>🎙️ Direct Audio Session ↗</span>
                                     </a>
@@ -2675,10 +2656,14 @@
                             <div class="advisor-info-header" style="text-align: center; margin-bottom: 16px;">
                                 <div style="font-size: 1.6rem; margin-bottom: 4px;">🧠</div>
                                 <div style="font-weight: 700; font-size: 1.05rem; color: #1e293b;">Vyapaar AI • Live Conversational Partner</div>
-                                <div style="font-size: 0.82rem; color: #64748b;">Tap the voice orb below or launch the direct audio session</div>
+                                <div style="font-size: 0.82rem; color: #64748b;">Tap below to start real-time voice conversation</div>
                             </div>
-                            <elevenlabs-convai agent-id="agent_1901m4kqdmycfkn9pra87mp8jmtd" id="elevenlabs-widget"></elevenlabs-convai>
-                            <div style="margin-top: 18px; text-align: center;">
+                            <div style="text-align: center; margin-bottom: 16px;">
+                                <button onclick="openHomeElevenLabsModal(event)" style="padding: 12px 28px; background: linear-gradient(135deg, #4f46e5, #7c3aed); color: #fff; border: none; border-radius: 9999px; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);">
+                                    🎙️ Open Voice Agent (Kavya)
+                                </button>
+                            </div>
+                            <div style="margin-top: 10px; text-align: center;">
                                 <a href="https://elevenlabs.io/app/talk-to?agent_id=agent_1901m4kqdmycfkn9pra87mp8jmtd" target="_blank" class="btn-advisor-fallback" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #4f46e5; color: #ffffff; border-radius: 9999px; font-size: 0.88rem; font-weight: 600; text-decoration: none; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3); transition: transform 0.15s ease;">
                                     <span>🎙️ Launch Direct ElevenLabs Voice Session</span>
                                     <span>↗</span>
@@ -3052,160 +3037,9 @@
         // =====================================================================
         // ELEVENLABS CONVAI WIDGET CUSTOM STYLING (SHADOW DOM INJECTION)
         // =====================================================================
-        function setupElevenLabsWidget() {
-            const el = document.getElementById('elevenlabs-widget');
-            if (!el) return;
-
-            let attempts = 0;
-            function injectShadowStyles() {
-                attempts++;
-                if (!el.shadowRoot) {
-                    if (attempts < 40) setTimeout(injectShadowStyles, 150);
-                    return;
-                }
-
-                let style = el.shadowRoot.getElementById('custom-convai-override');
-                if (!style) {
-                    style = document.createElement('style');
-                    style.id = 'custom-convai-override';
-                    el.shadowRoot.appendChild(style);
-                }
-
-                style.textContent = `
-                    :host {
-                        position: relative !important;
-                        inset: auto !important;
-                        width: 100% !important;
-                        min-height: 220px !important;
-                        display: flex !important;
-                        flex-direction: column !important;
-                        align-items: center !important;
-                        justify-content: center !important;
-                        pointer-events: auto !important;
-                    }
-                    .overlay, [class*="overlay"] {
-                        position: relative !important;
-                        inset: auto !important;
-                        right: auto !important;
-                        bottom: auto !important;
-                        display: flex !important;
-                        flex-direction: column !important;
-                        align-items: center !important;
-                        justify-content: center !important;
-                        width: 100% !important;
-                        margin: 0 auto !important;
-                    }
-                    .rounded-sheet, .rounded-compact-sheet, [class*="sheet"] {
-                        transform-origin: center center !important;
-                        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
-                        border: 1px solid rgba(0, 0, 0, 0.08) !important;
-                    }
-                    button, [role="button"] {
-                        cursor: pointer !important;
-                        pointer-events: auto !important;
-                    }
-                `;
-
-                // If still initializing, retry gently a couple more times
-                if (attempts < 15) {
-                    setTimeout(injectShadowStyles, 300);
-                }
-            }
-            injectShadowStyles();
-        }
-
         // =====================================================================
         // HOME PAGE ELEVENLABS MODAL CONTROLS
         // =====================================================================
-        // Check and request microphone permission
-        async function checkAndRequestMicPermission() {
-            const statusEl = document.getElementById('el-mic-status-badge');
-            const tipEl = document.getElementById('el-mic-status-tip');
-            if (statusEl) {
-                statusEl.innerHTML = '<span>⏳</span> <span>Testing microphone access...</span>';
-                statusEl.className = 'el-mic-badge testing';
-            }
-
-            const isSecure = window.isSecureContext || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            if (!isSecure) {
-                if (statusEl) {
-                    statusEl.innerHTML = '<span>⚠️</span> <span>Insecure Context (HTTP with IP)</span>';
-                    statusEl.className = 'el-mic-badge warning';
-                }
-                if (tipEl) {
-                    tipEl.innerHTML = 'Browsers block microphone on plain HTTP with IP. Open <b>http://localhost:3000</b> or use the Direct Audio Session link.';
-                }
-                return false;
-            }
-
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                if (statusEl) {
-                    statusEl.innerHTML = '<span>❌</span> <span>Audio recording not supported</span>';
-                    statusEl.className = 'el-mic-badge error';
-                }
-                return false;
-            }
-
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                // Immediately release tracks so ElevenLabs gets exclusive mic hardware access
-                stream.getTracks().forEach(t => t.stop());
-                if (statusEl) {
-                    statusEl.innerHTML = '<span>🟢</span> <span>Microphone Active & Ready</span>';
-                    statusEl.className = 'el-mic-badge success';
-                }
-                if (tipEl) {
-                    tipEl.innerHTML = 'Microphone permission active. Tap <b>"Start Voice Call"</b> or the animated orb to talk!';
-                }
-                return true;
-            } catch (err) {
-                console.warn('[Microphone Permission Check Failed]', err);
-                if (statusEl) {
-                    statusEl.innerHTML = '<span>🚫</span> <span>Microphone Blocked / Denied</span>';
-                    statusEl.className = 'el-mic-badge error';
-                }
-                if (tipEl) {
-                    tipEl.innerHTML = 'Click the <b>lock / tune icon 🔒</b> in your address bar and change <b>Microphone</b> to <b>"Allow"</b>, then refresh.';
-                }
-                return false;
-            }
-        }
-
-        async function startElevenLabsConversation() {
-            const el = document.getElementById('home-modal-elevenlabs-widget');
-            if (!el) return;
-            const ok = await checkAndRequestMicPermission();
-            if (!ok) {
-                alert('Microphone permission required! Please allow microphone access in your browser to speak with the agent.');
-                return;
-            }
-            try {
-                if (typeof el.startConversation === 'function') {
-                    await el.startConversation();
-                } else if (el.shadowRoot) {
-                    const btn = el.shadowRoot.querySelector('button, [role="button"]');
-                    if (btn) btn.click();
-                }
-            } catch (err) {
-                console.warn('[ElevenLabs start error]', err);
-            }
-        }
-
-        function endElevenLabsConversation() {
-            const el = document.getElementById('home-modal-elevenlabs-widget');
-            if (!el) return;
-            try {
-                if (typeof el.endConversation === 'function') {
-                    el.endConversation();
-                } else if (el.shadowRoot) {
-                    const btn = el.shadowRoot.querySelector('button, [role="button"]');
-                    if (btn) btn.click();
-                }
-            } catch (err) {
-                console.warn('[ElevenLabs end error]', err);
-            }
-        }
-
         function openHomeElevenLabsModal(e) {
             if (e) {
                 try { e.preventDefault(); e.stopPropagation(); } catch (err) {}
@@ -3213,8 +3047,6 @@
             const modal = document.getElementById('home-el-modal');
             if (modal) {
                 modal.classList.add('active');
-                setupHomeElevenLabsWidget();
-                checkAndRequestMicPermission();
             }
         }
 
@@ -3226,78 +3058,6 @@
             if (modal) {
                 modal.classList.remove('active');
             }
-        }
-
-        function setupHomeElevenLabsWidget() {
-            const el = document.getElementById('home-modal-elevenlabs-widget');
-            if (!el) return;
-
-            if (!el._hasConversationListeners) {
-                el._hasConversationListeners = true;
-                el.addEventListener('conversationStarted', () => {
-                    console.log('[ElevenLabs] Conversation started! Microphone is streaming.');
-                    const liveIndicator = document.getElementById('el-live-call-status');
-                    if (liveIndicator) {
-                        liveIndicator.innerHTML = '<span class="pulse-dot red"></span> <strong>Live Call:</strong> Listening to your voice... Say "Sharma paid 2k"';
-                        liveIndicator.className = 'el-live-call-status active';
-                    }
-                });
-                el.addEventListener('conversationEnded', () => {
-                    console.log('[ElevenLabs] Conversation ended.');
-                    const liveIndicator = document.getElementById('el-live-call-status');
-                    if (liveIndicator) {
-                        liveIndicator.innerHTML = '<span>⚪</span> <strong>Status:</strong> Call ended. Tap Start Call to talk again';
-                        liveIndicator.className = 'el-live-call-status idle';
-                    }
-                });
-                el.addEventListener('error', (err) => {
-                    console.error('[ElevenLabs Event Error]', err);
-                    const liveIndicator = document.getElementById('el-live-call-status');
-                    if (liveIndicator) {
-                        liveIndicator.innerHTML = '<span>⚠️</span> Connection failed. Check ElevenLabs agent settings.';
-                        liveIndicator.className = 'el-live-call-status error';
-                    }
-                });
-            }
-
-            let attempts = 0;
-            function injectHomeStyles() {
-                attempts++;
-                if (!el.shadowRoot) {
-                    if (attempts < 30) setTimeout(injectHomeStyles, 150);
-                    return;
-                }
-
-                let style = el.shadowRoot.getElementById('home-custom-convai-override');
-                if (!style) {
-                    style = document.createElement('style');
-                    style.id = 'home-custom-convai-override';
-                    el.shadowRoot.appendChild(style);
-                }
-
-                style.textContent = `
-                    :host {
-                        position: relative !important;
-                        inset: auto !important;
-                        width: 100% !important;
-                        min-height: 180px !important;
-                        display: flex !important;
-                        flex-direction: column !important;
-                        align-items: center !important;
-                        justify-content: center !important;
-                        pointer-events: auto !important;
-                    }
-                    button, [role="button"] {
-                        cursor: pointer !important;
-                        pointer-events: auto !important;
-                    }
-                `;
-
-                if (attempts < 8) {
-                    setTimeout(injectHomeStyles, 300);
-                }
-            }
-            injectHomeStyles();
         }
 
         // Open Agent Detail View
