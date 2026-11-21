@@ -1,0 +1,52 @@
+[
+  {
+    "id": "SUP001",
+    "name": "Sharma Traders",
+    "contactPerson": "Ramesh Sharma",
+    "phone": "+916363077110",
+    "category": "Raw Materials & Packaging",
+    "reliabilityScore": 9.2,
+    "isPrimary": true,
+    "notes": "Primary packaging supplier, high reliability rating"
+  },
+  {
+    "id": "SUP027",
+    "name": "Devi and Sons",
+    "contactPerson": "Leela Dua",
+    "phone": "+916363077110",
+    "category": "Kitchen Gadgets",
+    "reliabilityScore": 8.8,
+    "isPrimary": false,
+    "notes": "Cookware & appliance parts distributor"
+  },
+  {
+    "id": "SUP023",
+    "name": "Raghavan-Ghosh Supplies",
+    "contactPerson": "Nidra Acharya",
+    "phone": "+916363077110",
+    "category": "Fresh Groceries",
+    "reliabilityScore": 8.5,
+    "isPrimary": false,
+    "notes": "Produce & dairy bulk fulfillment"
+  },
+  {
+    "id": "SUP017",
+    "name": "Chhabra Ltd",
+    "contactPerson": "Anita Manda",
+    "phone": "+916363077110",
+    "category": "Women's Apparel",
+    "reliabilityScore": 8.0,
+    "isPrimary": false,
+    "notes": "Fabric & apparel supplier"
+  },
+  {
+    "id": "SUP040",
+    "name": "Kata LLC",
+    "contactPerson": "Sudiksha Bobal",
+    "phone": "+916363077110",
+    "category": "Small Electronics",
+    "reliabilityScore": 9.0,
+    "isPrimary": false,
+    "notes": "Electronic components distributor"
+  }
+]

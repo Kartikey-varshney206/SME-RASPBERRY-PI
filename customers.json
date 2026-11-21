@@ -1,0 +1,57 @@
+[
+  {
+    "id": "CUST001",
+    "name": "Ramesh Kumar",
+    "phone": "+916363077110",
+    "amountPending": 42000,
+    "daysOverdue": 45,
+    "invoiceId": "INV00892",
+    "dueDate": "2025-04-15",
+    "riskTier": "High",
+    "notes": "Highest overdue account - critical collection priority"
+  },
+  {
+    "id": "CUST0445",
+    "name": "Tejas Sem",
+    "phone": "+916363077110",
+    "amountPending": 206590.32,
+    "daysOverdue": 30,
+    "invoiceId": "INV00145",
+    "dueDate": "2025-05-02",
+    "riskTier": "High",
+    "notes": "Bulk electronics order, 30 days overdue"
+  },
+  {
+    "id": "CUST0120",
+    "name": "Nachiket Divan",
+    "phone": "+916363077110",
+    "amountPending": 138196.75,
+    "daysOverdue": 29,
+    "invoiceId": "INV00913",
+    "dueDate": "2025-05-03",
+    "riskTier": "Medium",
+    "notes": "Apparel retail branch overdue"
+  },
+  {
+    "id": "CUST0161",
+    "name": "Amrita Bhargava",
+    "phone": "+916363077110",
+    "amountPending": 216726.24,
+    "daysOverdue": 28,
+    "invoiceId": "INV01616",
+    "dueDate": "2025-05-04",
+    "riskTier": "High",
+    "notes": "Second reminder scheduled"
+  },
+  {
+    "id": "CUST0266",
+    "name": "Mekhala Wali",
+    "phone": "+916363077110",
+    "amountPending": 209042.39,
+    "daysOverdue": 28,
+    "invoiceId": "INV02664",
+    "dueDate": "2025-05-04",
+    "riskTier": "Medium",
+    "notes": "Follow-up required"
+  }
+]
